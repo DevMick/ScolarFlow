@@ -7,6 +7,13 @@
  * Il initialise l'app Express avec toutes les routes et l'exporte pour Vercel
  */
 
+// Imports - utiliser des chemins qui fonctionnent au runtime
+// Le fichier api/server.ts est compilé dans dist/api/server.js
+// Au runtime, les fichiers compilés sont dans dist/server.js, dist/routes/index.js, etc.
+// Donc depuis dist/api/, on doit pointer vers ../ pour accéder à dist/
+
+// Import depuis src/ pour TypeScript (sera compilé vers dist/)
+// Au runtime, Node.js cherchera dans dist/ depuis dist/api/
 import { app, prisma } from '../src/server';
 import { createApiRoutes } from '../src/routes';
 import { notFoundHandler } from '../src/middleware/errorHandler';
