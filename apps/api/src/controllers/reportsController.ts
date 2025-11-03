@@ -10,7 +10,7 @@ import {
   ExportService
 } from '../services/reports';
 import { StatisticsEngine } from '../services/statistics/StatisticsEngine';
-import { EvaluationService } from '../services/EvaluationService';
+import { EvaluationService } from '../services/evaluationService';
 import { 
   ReportGenerationOptions,
   ReportExportOptions,

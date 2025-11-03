@@ -6,7 +6,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { ReportsController } from '../controllers/reportsController';
 import { StatisticsEngine } from '../services/statistics/StatisticsEngine';
-import { EvaluationService } from '../services/EvaluationService';
+import { EvaluationService } from '../services/evaluationService';
 import { authenticateToken } from '../middleware/auth';
 import { validateBody, validateQuery } from '../middleware/validation';
 import { rateLimit } from 'express-rate-limit';

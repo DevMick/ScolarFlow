@@ -283,4 +283,52 @@ export class EvaluationService {
       throw error;
     }
   }
+
+  // Méthode stub pour compatibilité
+  async getEvaluationById(id: number, userId: number): Promise<EvaluationSimple | null> {
+    try {
+      const evaluation = await (this.prisma as any).evaluations.findFirst({
+        where: {
+          id,
+          class_id: {
+            in: await (this.prisma as any).classes.findMany({
+              where: { user_id: userId },
+              select: { id: true }
+            }).then((classes: any[]) => classes.map(c => c.id))
+          }
+        },
+        include: {
+          classes: { select: { id: true, name: true } },
+          school_years: { select: { id: true, start_year: true, end_year: true } }
+        }
+      });
+
+      if (!evaluation) return null;
+
+      return {
+        id: evaluation.id,
+        classId: evaluation.class_id,
+        schoolYearId: evaluation.school_year_id,
+        nom: evaluation.nom,
+        date: evaluation.date.toISOString().split('T')[0],
+        createdAt: evaluation.created_at.toISOString(),
+        updatedAt: evaluation.updated_at.toISOString(),
+        class: evaluation.classes,
+        schoolYear: {
+          id: evaluation.school_years.id,
+          startYear: evaluation.school_years.start_year,
+          endYear: evaluation.school_years.end_year,
+          name: `${evaluation.school_years.start_year}-${evaluation.school_years.end_year}`
+        }
+      };
+    } catch (error) {
+      console.error('Erreur lors de la récupération de l\'évaluation:', error);
+      return null;
+    }
+  }
+
+  // Méthode stub pour compatibilité
+  async getClassEvaluations(classId: number, userId: number): Promise<EvaluationSimple[]> {
+    return this.getEvaluationsByClass(classId, userId);
+  }
 }

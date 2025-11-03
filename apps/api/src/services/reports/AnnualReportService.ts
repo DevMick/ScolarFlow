@@ -19,7 +19,7 @@ import {
 import { AnalyticsEngine } from './AnalyticsEngine';
 import { RecommendationEngine } from './RecommendationEngine';
 import { StatisticsEngine } from '../statistics/StatisticsEngine';
-import { EvaluationService } from '../EvaluationService';
+import { EvaluationService } from '../evaluationService';
 
 /**
  * Service principal pour la génération de bilans annuels complets
