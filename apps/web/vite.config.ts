@@ -14,7 +14,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@edustats/shared': path.resolve(__dirname, '../../packages/shared'),
     },
+    preserveSymlinks: true,
   },
   define: {
     'process.env': process.env
