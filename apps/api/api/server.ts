@@ -7,12 +7,12 @@
  * Il initialise l'app Express avec toutes les routes et l'exporte pour Vercel
  */
 
-import { app, prisma } from '../server';
-import { createApiRoutes } from '../routes';
-import { notFoundHandler } from '../middleware/errorHandler';
-import { secureErrorHandler } from '../middleware/errorHandler.security';
-import { ensureDirectories } from '../utils/fileUpload';
-import { Logger } from '../utils/logger';
+import { app, prisma } from '../src/server';
+import { createApiRoutes } from '../src/routes';
+import { notFoundHandler } from '../src/middleware/errorHandler';
+import { secureErrorHandler } from '../src/middleware/errorHandler.security';
+import { ensureDirectories } from '../src/utils/fileUpload';
+import { Logger } from '../src/utils/logger';
 
 // Initialiser les routes pour Vercel (une seule fois)
 let routesInitialized = false;
