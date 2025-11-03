@@ -46,7 +46,7 @@ export function createResultRoutes(prisma: PrismaClient): Router {
   // Initialisation des services et contrôleur
   const calculationService = new CalculationService(prisma);
   const validationService = new ValidationService(prisma);
-  const resultService = new ResultService(prisma, calculationService, validationService);
+  const resultService = new ResultService(prisma, validationService, calculationService);
   const resultController = new ResultController(resultService, calculationService);
 
   // Appliquer l'authentification et le rate limiting à toutes les routes
