@@ -190,7 +190,7 @@ export class ClassController {
         return;
       }
 
-      const years = await this.classService.getAcademicYears(req.user.id);
+      const years = await this.classService.getAcademicYears();
 
       ApiResponseHelper.success(
         res,

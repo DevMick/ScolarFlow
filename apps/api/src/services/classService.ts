@@ -263,4 +263,25 @@ export class ClassService {
       throw new Error('Erreur lors de la récupération de la classe');
     }
   }
+
+  // Méthode stub pour compatibilité
+  async getAcademicYears(): Promise<string[]> {
+    try {
+      const schoolYears = await this.prisma.school_years.findMany({
+        select: {
+          start_year: true,
+          end_year: true
+        },
+        distinct: ['start_year', 'end_year'],
+        orderBy: {
+          start_year: 'desc'
+        }
+      });
+
+      return schoolYears.map(sy => `${sy.start_year}-${sy.end_year}`);
+    } catch (error) {
+      Logger.error('Failed to fetch academic years', error);
+      return [];
+    }
+  }
 }

@@ -108,7 +108,8 @@ export class StatisticsEngine {
 
     } catch (error) {
       console.error('Erreur génération statistiques:', error);
-      throw new Error(`Erreur lors du calcul des statistiques: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      throw new Error(`Erreur lors du calcul des statistiques: ${errorMessage}`);
     }
   }
 
@@ -424,18 +425,25 @@ export class StatisticsEngine {
     // Insights sur les groupes performants/en difficulté
     if (statistics.byGroup) {
       const groupStats = Object.entries(statistics.byGroup);
-      const sortedByAverage = groupStats.sort((a, b) => b[1].average - a[1].average);
+      const sortedByAverage = groupStats.sort((a, b) => {
+        const avgA = (a[1] as any)?.average || 0;
+        const avgB = (b[1] as any)?.average || 0;
+        return avgB - avgA;
+      });
 
       if (sortedByAverage.length >= 2) {
         const best = sortedByAverage[0];
         const worst = sortedByAverage[sortedByAverage.length - 1];
-        const gap = best[1].average - worst[1].average;
+        const bestAvg = (best[1] as any)?.average || 0;
+        const worstAvg = (worst[1] as any)?.average || 0;
+        const gap = bestAvg - worstAvg;
 
-        if (gap > statistics.global.average * 0.2) {
+        const globalAvg = (statistics.global as any)?.average || 0;
+        if (gap > globalAvg * 0.2) {
           insights.push({
             type: 'recommendation',
             title: 'Écart significatif détecté',
-            description: `Un écart de ${gap.toFixed(1)} points existe entre "${best[0]}" (${best[1].average.toFixed(1)}) et "${worst[0]}" (${worst[1].average.toFixed(1)}).`,
+            description: `Un écart de ${gap.toFixed(1)} points existe entre "${best[0]}" (${bestAvg.toFixed(1)}) et "${worst[0]}" (${worstAvg.toFixed(1)}).`,
             confidence: 0.85,
             actionable: true,
             priority: 'high'

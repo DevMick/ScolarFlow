@@ -298,7 +298,7 @@ export class CustomTableService {
   ): Promise<TableCell> {
     let value: any = null;
     let formattedValue = '';
-    let style: React.CSSProperties = {};
+    let style: Record<string, any> = {};
     const metadata: any = {};
 
     switch (column.type) {

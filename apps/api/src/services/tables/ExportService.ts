@@ -490,15 +490,19 @@ export class ExportService {
    * Échappe le HTML
    */
   private escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    // Échapper le HTML en remplaçant les caractères spéciaux
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   /**
    * Convertit un style React en CSS
    */
-  private convertStyleToCSS(style?: React.CSSProperties): string {
+  private convertStyleToCSS(style?: Record<string, any>): string {
     if (!style) return '';
     
     return Object.entries(style)

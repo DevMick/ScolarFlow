@@ -4,7 +4,7 @@
 
 import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { createEvaluationRoutes } from './evaluations';
+import evaluationRoutes from './evaluations';
 import { createResultRoutes } from './results';
 import { createCalculationRoutes } from './calculations';
 import statisticsRoutes from './statistics';
@@ -98,7 +98,7 @@ export async function createApiRoutes(prisma: PrismaClient): Promise<Router> {
   
   // Routes pour les bilans annuels (Phase 7)
   const { StatisticsEngine } = await import('../services/statistics/StatisticsEngine');
-  const { EvaluationService } = await import('../services/EvaluationService');
+  const { EvaluationService } = await import('../services/evaluationService');
   const statisticsEngine = new StatisticsEngine(prisma);
   const evaluationService = new EvaluationService(prisma);
   router.use('/reports', createReportsRoutes(prisma, statisticsEngine, evaluationService));

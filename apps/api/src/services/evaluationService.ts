@@ -328,7 +328,8 @@ export class EvaluationService {
   }
 
   // Méthode stub pour compatibilité
-  async getClassEvaluations(classId: number, userId: number): Promise<EvaluationSimple[]> {
-    return this.getEvaluationsByClass(classId, userId);
+  async getClassEvaluations(classId: number, userId: number, options?: any): Promise<{ evaluations: EvaluationSimple[] }> {
+    const evaluations = await this.getEvaluationsByClass(classId, userId);
+    return { evaluations };
   }
 }

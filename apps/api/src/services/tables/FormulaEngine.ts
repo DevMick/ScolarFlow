@@ -9,6 +9,13 @@ type FormulaVariable = any;
 type FormulaResult = any;
 type FormulaContext = any;
 type FormulaResultType = any;
+const FormulaResultType = {
+  Number: 'number',
+  Text: 'text',
+  Boolean: 'boolean',
+  Date: 'date',
+  Error: 'error'
+};
 
 /**
  * Nœud de l'arbre syntaxique abstrait (AST)

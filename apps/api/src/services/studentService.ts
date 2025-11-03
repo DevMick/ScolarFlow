@@ -25,7 +25,14 @@ export interface StudentFilters {
   schoolYearId?: number; // Filtrer par année scolaire
 }
 
-export interface StudentWithClass extends Student {
+export interface StudentWithClass {
+  id: number;
+  classId: number;
+  schoolYearId: number;
+  name: string;
+  gender?: 'M' | 'F';
+  studentNumber?: string;
+  isActive?: boolean;
   class: {
     id: number;
     name: string;
