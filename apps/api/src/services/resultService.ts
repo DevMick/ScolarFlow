@@ -199,40 +199,7 @@ export class ResultService {
 
       // @ts-ignore - evaluationResult model not in Prisma schema yet
       const results: any[] = [];
-        where: {
-          studentId,
-          evaluation: {
-            classId,
-            ...(includeFinalized ? {} : { isFinalized: false }),
-            ...(subject ? { subject: { equals: subject, mode: 'insensitive' } } : {})
-          }
-        },
-        include: {
-          student: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              studentNumber: true,
-              isActive: true
-            }
-          },
-          evaluation: {
-            select: {
-              id: true,
-              title: true,
-              subject: true,
-              maxScore: true,
-              evaluationDate: true,
-              isFinalized: true
-            }
-          }
-        },
-        orderBy: {
-          evaluation: { evaluationDate: 'desc' }
-        },
-        take: limit
-      });
+      // TODO: Implémenter avec le modèle evaluationResult quand il sera disponible
 
       return results as ResultWithStudent[];
     }, 'Récupération des résultats de l\'élève');

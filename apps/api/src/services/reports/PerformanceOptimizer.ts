@@ -186,9 +186,7 @@ export class PerformanceOptimizer {
           select: {
             id: true,
             nom: true,
-            max_score: true,
-            created_at: true,
-            type: true
+            created_at: true
           },
           orderBy: { created_at: 'asc' }
         }),
