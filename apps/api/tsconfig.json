@@ -38,7 +38,8 @@
   },
   "include": [
     "src/**/*",
-    "src/types/stubs/**/*"
+    "src/types/stubs/**/*",
+    "api/**/*"
   ],
   "exclude": [
     "node_modules",
