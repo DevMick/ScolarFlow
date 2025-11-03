@@ -15,7 +15,11 @@ backup_*.sql
 *.ps1
 *.bat
 *.sh
-scripts/
+# Exclure les scripts de test/dev mais garder les scripts de build
+scripts/*.test.js
+scripts/*.spec.js
+scripts/test-*.js
+scripts/debug-*.js
 docs/
 
 # Fichiers de configuration locaux
