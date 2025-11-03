@@ -16,6 +16,7 @@ import {
   ReportExportOptions,
   DEFAULT_REPORT_CONFIG
 } from '@edustats/shared/types';
+// TODO: Remplacer par des types locaux si le package n'existe pas
 import { z } from 'zod';
 
 /**
@@ -134,7 +135,7 @@ export class ReportsController {
       } = req.query;
 
       // Récupération des classes de l'utilisateur
-      const userClasses = await this.prisma.class.findMany({
+      const userClasses = await this.prisma.classes.findMany({
         where: { userId },
         select: { id: true }
       });
@@ -546,7 +547,7 @@ export class ReportsController {
       } = req.query;
 
       // Récupération des classes de l'utilisateur
-      const userClasses = await this.prisma.class.findMany({
+      const userClasses = await this.prisma.classes.findMany({
         where: { userId },
         select: { id: true }
       });
@@ -646,7 +647,7 @@ export class ReportsController {
       const archives = await this.archiveService.searchArchives(query);
 
       // Filtrer par les classes de l'utilisateur
-      const userClasses = await this.prisma.class.findMany({
+      const userClasses = await this.prisma.classes.findMany({
         where: { userId },
         select: { id: true }
       });

@@ -6,7 +6,7 @@ import { createSecureUploader, validateUploadedFile, cleanupUploadOnError } from
 import { validateParams } from '../middleware/validation';
 import { idSchema } from '../validations/common.validations';
 
-const router = Router();
+const router: Router = Router();
 
 // Configuration sécurisée de multer pour l'upload d'images
 const upload = createSecureUploader({

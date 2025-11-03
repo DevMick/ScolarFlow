@@ -1,9 +1,9 @@
-import express from 'express';
+import express, { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import { EvaluationController } from '../controllers/evaluationController';
 import { authenticateToken } from '../middleware/auth';
 
-const router = express.Router();
+const router: Router = express.Router();
 const evaluationController = new EvaluationController();
 
 // Middleware d'authentification pour toutes les routes

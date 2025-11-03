@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { BilanExportService } from '../services/bilanExportService';
 
-const router = Router();
+const router: Router = Router();
 
 // Route pour exporter le bilan annuel en Word
 router.post('/bilan-annuel', async (req: Request, res: Response) => {

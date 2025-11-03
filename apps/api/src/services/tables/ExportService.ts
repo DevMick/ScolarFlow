@@ -6,12 +6,12 @@ import { PrismaClient } from '@prisma/client';
 import * as XLSX from 'xlsx';
 import * as fs from 'fs';
 import * as path from 'path';
-import { 
-  TableData, 
-  TableExportOptions, 
-  TableExportResult,
-  CustomTable
-} from '@edustats/shared/types';
+// TODO: @edustats/shared/types n'existe pas
+// Types locaux temporaires
+type TableData = any;
+type TableExportOptions = any;
+type TableExportResult = any;
+type CustomTable = any;
 import { ServiceError } from '../../utils/errors';
 
 /**

@@ -75,7 +75,7 @@ export class ExportService {
   ): Promise<ExportResult> {
     try {
       // Récupérer les données de la classe
-      const classData = await this.prisma.class.findFirst({
+      const classData = await this.prisma.classes.findFirst({
         where: { id: classId },
         include: { user: true }
       });
@@ -85,7 +85,7 @@ export class ExportService {
       }
 
       // Récupérer les données de l'évaluation
-      const evaluationData = await this.prisma.evaluation.findFirst({
+      const evaluationData = await this.prisma.evaluations.findFirst({
         where: { id: evaluationId }
       });
 
@@ -107,7 +107,7 @@ export class ExportService {
 
       // Récupérer les matières
       const subjects = await this.prisma.subject.findMany({
-        where: { classId: classId }
+        where: { class_id: classId }
       });
 
       if (subjects.length === 0) {
@@ -116,8 +116,8 @@ export class ExportService {
 
       // Récupérer les élèves avec leurs notes et moyennes depuis la base de données
       const studentsData: MoyenneData[] = [];
-      const students = await this.prisma.student.findMany({
-        where: { classId: classId }
+      const students = await this.prisma.students.findMany({
+        where: { class_id: classId }
       });
 
       for (const student of students) {
@@ -197,8 +197,8 @@ export class ExportService {
       };
 
       // Récupérer TOUS les élèves de la classe pour les statistiques
-      const allStudents = await this.prisma.student.findMany({
-        where: { classId: classId }
+      const allStudents = await this.prisma.students.findMany({
+        where: { class_id: classId }
       });
       
       // Calculer les statistiques par genre pour le récapitulatif
@@ -255,7 +255,7 @@ export class ExportService {
   ): Promise<ExportResult> {
     try {
       // Récupérer les données de la classe
-      const classData = await this.prisma.class.findFirst({
+      const classData = await this.prisma.classes.findFirst({
         where: { id: classId },
         include: { user: true }
       });
@@ -265,7 +265,7 @@ export class ExportService {
       }
 
       // Récupérer les données de l'évaluation
-      const evaluationData = await this.prisma.evaluation.findFirst({
+      const evaluationData = await this.prisma.evaluations.findFirst({
         where: { id: evaluationId }
       });
 
@@ -275,12 +275,12 @@ export class ExportService {
 
       // Récupérer les matières de la classe
       const subjects = await this.prisma.subject.findMany({
-        where: { classId: classId }
+        where: { class_id: classId }
       });
 
       // Récupérer les élèves de la classe
-      const students = await this.prisma.student.findMany({
-        where: { classId: classId }
+      const students = await this.prisma.students.findMany({
+        where: { class_id: classId }
       });
 
       // Récupérer les notes et moyennes depuis la base de données
@@ -1427,7 +1427,7 @@ async exportStudents(
    * Récupère les données de la classe
    */
   private async getClassData(classId: number) {
-    return await this.prisma.class.findUniqueOrThrow({
+    return await this.prisma.classes.findUniqueOrThrow({
       where: { id: classId },
       include: {
         user: {
@@ -1448,7 +1448,7 @@ async exportStudents(
     classId: number,
     options: ExportOptions
   ): Promise<Student[]> {
-    const students = await this.prisma.student.findMany({
+    const students = await this.prisma.students.findMany({
       where: {
         classId,
         ...(options.includeInactive ? {} : { isActive: true })
@@ -1495,7 +1495,7 @@ async exportStudents(
    * Vérifie qu'une classe appartient à l'utilisateur
    */
   private async verifyClassOwnership(classId: number, userId: number): Promise<void> {
-    const classExists = await this.prisma.class.findFirst({
+    const classExists = await this.prisma.classes.findFirst({
       where: {
         id: classId,
         userId,

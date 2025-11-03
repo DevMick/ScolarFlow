@@ -34,10 +34,10 @@ router.get('/', async (req, res) => {
 router.get('/db-status', async (req, res) => {
   try {
     // Test database connection and get basic stats
-    const userCount = await prisma.user.count();
-    const classCount = await prisma.class.count();
-    const studentCount = await prisma.student.count();
-    const evaluationCount = await prisma.evaluation.count();
+    const userCount = await prisma.users.count();
+    const classCount = await prisma.classes.count();
+    const studentCount = await prisma.students.count();
+    const evaluationCount = await prisma.evaluations.count();
 
     res.json({
       status: 'connected',

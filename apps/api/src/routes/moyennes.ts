@@ -6,7 +6,7 @@ import { Router } from 'express';
 import { MoyenneController } from '../controllers/moyenneController';
 import { authenticateToken } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // Toutes les routes nécessitent une authentification
 router.use(authenticateToken);

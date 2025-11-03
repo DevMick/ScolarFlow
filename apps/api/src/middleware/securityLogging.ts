@@ -87,7 +87,7 @@ export function logSecurityEvent(
 export function detectAttackPatterns(input: string): string[] {
   const patterns: { pattern: RegExp; name: string }[] = [
     // Injection SQL
-    { pattern: /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b|('|;|--|#|/\*|\*/))/i, name: 'sql_injection' },
+    { pattern: /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b|('|;|--|#|\/\*|\*\/))/i, name: 'sql_injection' },
     // XSS
     { pattern: /<script|javascript:|onerror=|onload=|eval\(|document\.cookie/i, name: 'xss' },
     // Path traversal

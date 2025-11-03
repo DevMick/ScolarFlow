@@ -7,7 +7,7 @@ import { Logger } from '../utils/logger';
 import { FILE_PATHS } from '../config/export';
 import { MoyenneController } from '../controllers/moyenneController';
 
-const router = Router();
+const router: Router = Router();
 
 // Toutes les routes nécessitent une authentification
 router.use(authenticateToken);

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -41,7 +41,7 @@ import adminAuthRouter from './routes/adminAuthRoutes';
 import { createApiRoutes } from './routes';
 import AdminService from './services/adminService';
 
-const app = express();
+const app: Express = express();
 const DEFAULT_PORT = 3001;
 const PORT = process.env.PORT || DEFAULT_PORT;
 
@@ -277,5 +277,5 @@ async function startServer() {
 // Démarrer le serveur seulement si on n'est pas dans un environnement serverless (Vercel)
 // Vercel définit automatiquement VERCEL=1
 if (process.env.VERCEL !== '1' && !process.env.LAMBDA_TASK_ROOT) {
-  startServer();
+startServer();
 }

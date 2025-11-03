@@ -3,7 +3,7 @@ import { Router, Request, Response } from 'express';
 import AdminService from '../services/adminService';
 import { authenticateAdmin } from '../middleware/adminAuth';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * POST /api/admin/auth/login

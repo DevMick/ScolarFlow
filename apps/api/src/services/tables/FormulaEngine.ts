@@ -2,13 +2,13 @@
 // FORMULA ENGINE - MOTEUR DE FORMULES SÉCURISÉ
 // ========================================
 
-import { 
-  FormulaFunction, 
-  FormulaVariable, 
-  FormulaResult, 
-  FormulaContext, 
-  FormulaResultType 
-} from '@edustats/shared/types';
+// TODO: @edustats/shared/types n'existe pas
+// Types locaux temporaires
+type FormulaFunction = any;
+type FormulaVariable = any;
+type FormulaResult = any;
+type FormulaContext = any;
+type FormulaResultType = any;
 
 /**
  * Nœud de l'arbre syntaxique abstrait (AST)

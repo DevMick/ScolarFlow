@@ -15,6 +15,7 @@ import {
   AnalysisContext,
   StudentAnalysis
 } from '@edustats/shared/types';
+// TODO: Remplacer par des types locaux si le package n'existe pas
 
 /**
  * Base de connaissances pédagogiques pour générer des recommandations contextualisées

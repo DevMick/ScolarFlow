@@ -19,7 +19,7 @@ import {
   duplicateConfig
 } from '../controllers/statisticsController';
 
-const router = Router();
+const router: Router = Router();
 
 // ========================================
 // MIDDLEWARE DE LIMITATION DE DÉBIT

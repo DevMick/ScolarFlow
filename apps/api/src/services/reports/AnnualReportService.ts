@@ -15,6 +15,7 @@ import {
   GroupedRecommendations,
   DEFAULT_REPORT_CONFIG
 } from '@edustats/shared/types';
+// TODO: Remplacer par des types locaux si le package n'existe pas
 import { AnalyticsEngine } from './AnalyticsEngine';
 import { RecommendationEngine } from './RecommendationEngine';
 import { StatisticsEngine } from '../statistics/StatisticsEngine';
@@ -166,11 +167,11 @@ export class AnnualReportService {
   ): Promise<AnalysisContext> {
     
     // Informations de la classe
-    const classInfo = await this.prisma.class.findUnique({
+    const classInfo = await this.prisma.classes.findUnique({
       where: { id: classId },
       include: {
-        user: {
-          select: { firstName: true, lastName: true }
+        users: {
+          select: { first_name: true, last_name: true }
         }
       }
     });
@@ -180,19 +181,19 @@ export class AnnualReportService {
     }
     
     // Élèves de la classe
-    const students = await this.prisma.student.findMany({
+    const students = await this.prisma.students.findMany({
       where: { 
-        classId,
-        isActive: true
+        class_id: classId,
+        is_active: true
       },
-      orderBy: { lastName: 'asc' }
+      orderBy: { name: 'asc' }
     });
     
     // Évaluations de l'année
-    const evaluations = await this.prisma.evaluation.findMany({
+    const evaluations = await this.prisma.evaluations.findMany({
       where: {
-        classId,
-        createdAt: {
+        class_id: classId,
+        created_at: {
           gte: this.getAcademicYearStart(academicYear),
           lte: this.getAcademicYearEnd(academicYear)
         }
@@ -430,10 +431,10 @@ export class AnnualReportService {
    * Valide les permissions d'accès à la classe
    */
   private async validatePermissions(userId: number, classId: number): Promise<void> {
-    const classInfo = await this.prisma.class.findFirst({
+    const classInfo = await this.prisma.classes.findFirst({
       where: {
         id: classId,
-        userId: userId
+        user_id: userId
       }
     });
     

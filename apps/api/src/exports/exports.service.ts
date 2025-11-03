@@ -15,7 +15,7 @@ export class ExportsService {
 
   async exportEvaluationToPDF(evaluationId: number, classId: number) {
     // 1. Récupérer les données de l'évaluation
-    const evaluation = await this.prisma.evaluation.findUnique({
+    const evaluation = await this.prisma.evaluations.findUnique({
       where: { id: evaluationId },
     });
 
@@ -24,13 +24,13 @@ export class ExportsService {
     }
 
     // 2. Récupérer les données de la classe
-    const classData = await this.prisma.class.findUnique({
+    const classData = await this.prisma.classes.findUnique({
       where: { id: classId },
       include: {
-        user: {
+        users: {
           select: {
-            firstName: true,
-            lastName: true,
+            first_name: true,
+            last_name: true,
             establishment: true,
           },
         },
@@ -72,7 +72,7 @@ export class ExportsService {
     }
 
     // 4. Récupérer les élèves de la classe
-    const students = await this.prisma.student.findMany({
+    const students = await this.prisma.students.findMany({
       where: { classId: classId },
       orderBy: { name: 'asc' },
     });

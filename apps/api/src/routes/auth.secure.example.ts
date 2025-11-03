@@ -10,7 +10,7 @@ import { idSchema, paginationSchema } from '../validations/common.validations';
 import { errorCatcher } from '../middleware/errorHandler.security';
 import { csrfProtectionLite } from '../middleware/csrf';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * EXEMPLE 1 : Route d'inscription avec validation Zod

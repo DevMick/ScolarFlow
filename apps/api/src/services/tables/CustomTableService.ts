@@ -3,17 +3,17 @@
 // ========================================
 
 import { PrismaClient } from '@prisma/client';
-import { 
-  CustomTable, 
-  CustomTableConfig, 
-  CreateCustomTableData, 
-  UpdateCustomTableData,
-  TableData,
-  TableRow,
-  TableCell,
-  FormulaContext,
-  TableCategory
-} from '@edustats/shared/types';
+// TODO: @edustats/shared/types n'existe pas
+// Types locaux temporaires
+type CustomTable = any;
+type CustomTableConfig = any;
+type CreateCustomTableData = any;
+type UpdateCustomTableData = any;
+type TableData = any;
+type TableRow = any;
+type TableCell = any;
+type FormulaContext = any;
+type TableCategory = any;
 import { FormulaEngine } from './FormulaEngine';
 import { ServiceError, NotFoundError, ValidationError, ForbiddenError } from '../../utils/errors';
 
@@ -42,7 +42,9 @@ export class CustomTableService {
         await this.verifyClassOwnership(userId, data.classId);
       }
 
-      const table = await this.prisma.customTable.create({
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      throw new Error('customTable model not available in Prisma schema');
+      /* const table = await this.prisma.customTable.create({
         data: {
           userId,
           classId: data.classId,
@@ -56,7 +58,7 @@ export class CustomTableService {
         }
       });
 
-      return this.mapPrismaToCustomTable(table);
+      return this.mapPrismaToCustomTable(table); */
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la création du tableau', error);
@@ -68,10 +70,12 @@ export class CustomTableService {
    */
   async getTableById(userId: number, tableId: string): Promise<CustomTable> {
     try {
-      const table = await this.prisma.customTable.findUnique({
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      throw new Error('customTable model not available in Prisma schema');
+      /* const table = await this.prisma.customTable.findUnique({
         where: { id: parseInt(tableId) },
         include: {
-          user: { select: { firstName: true, lastName: true } },
+          users: { select: { first_name: true, last_name: true } },
           class: { select: { name: true, level: true } }
         }
       });
@@ -128,17 +132,19 @@ export class CustomTableService {
       }
 
       const [tables, total] = await Promise.all([
-        this.prisma.customTable.findMany({
+        // TODO: customTable n'existe pas dans le schéma Prisma
+        // this.prisma.customTable.findMany({
           where,
           include: {
-            user: { select: { firstName: true, lastName: true } },
+            users: { select: { first_name: true, last_name: true } },
             class: { select: { name: true, level: true } }
           },
           orderBy: { updatedAt: 'desc' },
           skip,
           take: limit
         }),
-        this.prisma.customTable.count({ where })
+        // TODO: customTable n'existe pas dans le schéma Prisma
+        // this.prisma.customTable.count({ where })
       ]);
 
       return {
@@ -159,7 +165,9 @@ export class CustomTableService {
     data: UpdateCustomTableData
   ): Promise<CustomTable> {
     try {
-      const existingTable = await this.prisma.customTable.findUnique({
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      const existingTable: any = null;
+      /* const existingTable = await this.prisma.customTable.findUnique({
         where: { id: parseInt(tableId) }
       });
 
@@ -190,11 +198,13 @@ export class CustomTableService {
         updateData.computedData = null;
       }
 
-      const updatedTable = await this.prisma.customTable.update({
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      throw new Error('customTable model not available');
+      /* const updatedTable = await this.prisma.customTable.update({
         where: { id: parseInt(tableId) },
         data: updateData,
         include: {
-          user: { select: { firstName: true, lastName: true } },
+          users: { select: { first_name: true, last_name: true } },
           class: { select: { name: true, level: true } }
         }
       });
@@ -211,7 +221,9 @@ export class CustomTableService {
    */
   async deleteTable(userId: number, tableId: string): Promise<void> {
     try {
-      const table = await this.prisma.customTable.findUnique({
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      throw new Error('customTable model not available in Prisma schema');
+      /* const table = await this.prisma.customTable.findUnique({
         where: { id: parseInt(tableId) }
       });
 
@@ -223,7 +235,9 @@ export class CustomTableService {
         throw new ForbiddenError('Vous ne pouvez supprimer que vos propres tableaux');
       }
 
-      await this.prisma.customTable.delete({
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      throw new Error('customTable model not available');
+      /* await this.prisma.customTable.delete({
         where: { id: parseInt(tableId) }
       });
     } catch (error) {
@@ -255,7 +269,9 @@ export class CustomTableService {
       const processingTime = Date.now() - startTime;
 
       // Mettre à jour le cache
-      await this.prisma.customTable.update({
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      throw new Error('customTable model not available');
+      /* await this.prisma.customTable.update({
         where: { id: parseInt(tableId) },
         data: {
           computedData: {
@@ -341,7 +357,7 @@ export class CustomTableService {
           cells.push(cell);
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Erreur de calcul';
-          errors.push(`Erreur colonne "${column.label}" pour ${student.firstName} ${student.lastName}: ${errorMessage}`);
+          errors.push(`Erreur colonne "${column.label}" pour ${(student as any).name || 'élève'}: ${errorMessage}`);
           
           cells.push({
             value: null,
@@ -456,10 +472,10 @@ export class CustomTableService {
    */
   private getStudentInfo(student: any, field?: string): any {
     switch (field) {
-      case 'firstName': return student.firstName;
-      case 'lastName': return student.lastName;
-      case 'fullName': return `${student.firstName} ${student.lastName}`;
-      case 'dateOfBirth': return student.dateOfBirth;
+      case 'firstName': return (student as any).firstName || (student as any).name?.split(' ')[1] || '';
+      case 'lastName': return (student as any).lastName || (student as any).name?.split(' ')[0] || '';
+      case 'fullName': return (student as any).name || '';
+      case 'dateOfBirth': return (student as any).dateOfBirth || (student as any).date_of_birth || null;
       case 'age': 
         if (student.dateOfBirth) {
           const today = new Date();
@@ -468,9 +484,9 @@ export class CustomTableService {
         }
         return null;
       case 'gender': return student.gender;
-      case 'studentNumber': return student.studentNumber;
+      case 'studentNumber': return (student as any).studentNumber || (student as any).student_number || '';
       case 'className': return student.class?.name;
-      default: return student.firstName;
+      default: return (student as any).firstName || (student as any).name || '';
     }
   }
 
@@ -480,9 +496,9 @@ export class CustomTableService {
   private buildFormulaContext(student: any, evaluationsData: any[], allStudents: any[]): Record<string, any> {
     const context: Record<string, any> = {
       // Informations élève
-      PRENOM: student.firstName,
-      NOM: student.lastName,
-      NOM_COMPLET: `${student.firstName} ${student.lastName}`,
+      PRENOM: (student as any).firstName || (student as any).name?.split(' ')[1] || '',
+      NOM: (student as any).lastName || (student as any).name?.split(' ')[0] || '',
+      NOM_COMPLET: (student as any).name || '',
       
       // Variables système
       DATE_AUJOURD_HUI: new Date(),
@@ -600,17 +616,16 @@ export class CustomTableService {
   private async getStudentsData(classId?: number): Promise<any[]> {
     if (!classId) return [];
 
-    return await this.prisma.student.findMany({
+    return await this.prisma.students.findMany({
       where: { 
-        classId,
-        isActive: true
+        class_id: classId,
+        is_active: true
       },
       include: {
         class: { select: { name: true, level: true } }
       },
       orderBy: [
-        { lastName: 'asc' },
-        { firstName: 'asc' }
+        { name: 'asc' }
       ]
     });
   }
@@ -621,16 +636,17 @@ export class CustomTableService {
   private async getEvaluationsData(classId?: number): Promise<any[]> {
     if (!classId) return [];
 
-    return await this.prisma.evaluation.findMany({
-      where: { classId },
+    return await this.prisma.evaluations.findMany({
+      where: { class_id: classId },
       include: {
-        results: {
-          include: {
-            student: { select: { id: true, firstName: true, lastName: true } }
-          }
-        }
+        // TODO: results n'existe pas dans evaluations
+        // notes: {
+        //   include: {
+        //     students: { select: { id: true, name: true } }
+        //   }
+        // }
       },
-      orderBy: { evaluationDate: 'desc' }
+      orderBy: { date: 'desc' }
     });
   }
 
@@ -677,10 +693,10 @@ export class CustomTableService {
    * Vérifie la propriété d'une classe
    */
   private async verifyClassOwnership(userId: number, classId: number): Promise<void> {
-    const classExists = await this.prisma.class.findFirst({
+    const classExists = await this.prisma.classes.findFirst({
       where: {
         id: classId,
-        teacherId: userId
+        user_id: userId
       }
     });
 

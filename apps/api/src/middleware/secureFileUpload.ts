@@ -3,7 +3,7 @@
 // ========================================
 
 import { Request, Response, NextFunction } from 'express';
-import multer from 'multer';
+import multer, { Multer } from 'multer';
 import { Logger } from '../utils/logger';
 import { ApiResponse } from '../types/express';
 import { randomBytes } from 'crypto';
@@ -109,7 +109,7 @@ export function createSecureUploader(
     destination?: string;
     fieldName?: string;
   } = {}
-) {
+): Multer {
   const {
     category = 'image',
     maxSize = MAX_FILE_SIZE,

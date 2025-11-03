@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { ClassThresholdController } from '../controllers/classThresholdController';
 import { authenticateToken } from '../middleware/auth';
 
-const router = Router();
+const router: Router = Router();
 
 // Toutes les routes nécessitent une authentification
 router.use(authenticateToken);

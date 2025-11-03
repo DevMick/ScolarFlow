@@ -30,7 +30,7 @@ import {
   createTemplateSchema
 } from '@edustats/shared/validation';
 
-const router = Router();
+const router: Router = Router();
 
 // ========================================
 // ROUTES TABLEAUX PERSONNALISÉS

@@ -12,6 +12,7 @@ import {
   ClassInsight,
   StudentAnalysis
 } from '@edustats/shared/types';
+// TODO: Remplacer par des types locaux si le package n'existe pas
 // Import conditionnel de pdfkit pour éviter les erreurs si non installé
 let PDFDocument: any;
 try {

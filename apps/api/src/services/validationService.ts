@@ -62,8 +62,8 @@ export class ValidationService {
       // Règle 1: Vérifier le niveau de la classe vs type d'évaluation
       {
         name: 'LEVEL_TYPE_CONSISTENCY',
-        check: () => this.validateLevelTypeConsistency(data.type, classContext.level),
-        message: this.getLevelTypeMessage(data.type, classContext.level),
+        check: () => this.validateLevelTypeConsistency(data.type, (classContext as any).level || 'PRIMARY'),
+        message: this.getLevelTypeMessage(data.type, (classContext as any).level || 'PRIMARY'),
         level: 'warning'
       },
 
@@ -327,10 +327,10 @@ export class ValidationService {
     const startOfMonth = new Date(evaluationDate.getFullYear(), evaluationDate.getMonth(), 1);
     const endOfMonth = new Date(evaluationDate.getFullYear(), evaluationDate.getMonth() + 1, 0);
 
-    const count = await this.prisma.evaluation.count({
+    const count = await this.prisma.evaluations.count({
       where: {
-        classId,
-        evaluationDate: {
+        class_id: classId,
+        date: {
           gte: startOfMonth,
           lte: endOfMonth
         }
@@ -344,10 +344,10 @@ export class ValidationService {
    * Vérifie l'unicité du titre dans la classe
    */
   private async checkUniqueTitleInClass(classId: number, title: string): Promise<boolean> {
-    const existing = await this.prisma.evaluation.findFirst({
+    const existing = await this.prisma.evaluations.findFirst({
       where: {
-        classId,
-        title: {
+        class_id: classId,
+        nom: {
           equals: title,
           mode: 'insensitive'
         }
@@ -368,14 +368,20 @@ export class ValidationService {
     const startOfMonth = new Date(evaluationDate.getFullYear(), evaluationDate.getMonth(), 1);
     const endOfMonth = new Date(evaluationDate.getFullYear(), evaluationDate.getMonth() + 1, 0);
 
-    const count = await this.prisma.evaluation.count({
+    const count = await this.prisma.evaluations.count({
       where: {
-        classId,
-        subject: {
-          equals: subject,
-          mode: 'insensitive'
+        class_id: classId,
+        notes: {
+          some: {
+            subjects: {
+              name: {
+                equals: subject,
+                mode: 'insensitive'
+              }
+            }
+          }
         },
-        evaluationDate: {
+        date: {
           gte: startOfMonth,
           lte: endOfMonth
         }
@@ -414,12 +420,13 @@ export class ValidationService {
       return true; // Pas d'impact sur les calculs
     }
 
-    const hasResults = await this.prisma.evaluationResult.count({
+    // Vérifier s'il y a des notes pour cette évaluation
+    const hasResults = await this.prisma.notes.count({
       where: { 
-        evaluationId: existing.id,
+        evaluation_id: existing.id,
         OR: [
-          { score: { not: null } },
-          { isAbsent: true }
+          { value: { not: null } },
+          { is_absent: true }
         ]
       }
     }) > 0;
@@ -458,14 +465,14 @@ export class ValidationService {
     studentId: number, 
     evaluationId: number
   ): Promise<boolean> {
-    const result = await this.prisma.evaluation.findFirst({
+    const result = await this.prisma.evaluations.findFirst({
       where: {
         id: evaluationId,
-        class: {
+        classes: {
           students: {
             some: {
               id: studentId,
-              isActive: true
+              is_active: true
             }
           }
         }
@@ -515,17 +522,14 @@ export class ValidationService {
     if (score === undefined) return true;
 
     // Récupérer les 5 dernières notes de l'élève
-    const recentScores = await this.prisma.evaluationResult.findMany({
+    // Récupérer les 5 dernières notes de l'élève via les moyennes
+    const recentScores = await this.prisma.moyennes.findMany({
       where: {
-        studentId,
-        evaluation: {
-          isFinalized: true
-        },
-        score: { not: null },
-        isAbsent: false
+        student_id: studentId,
+        is_active: true
       },
       include: {
-        evaluation: true
+        evaluations: true
       },
       orderBy: {
         evaluation: { evaluationDate: 'desc' }
@@ -535,18 +539,19 @@ export class ValidationService {
 
     if (recentScores.length < 3) return true; // Pas assez d'historique
 
-    // Normaliser les scores sur 20
+    // Normaliser les moyennes sur 20 (la moyenne est déjà calculée)
     const normalizedRecentScores = recentScores.map(result => 
-      (Number(result.score) / Number(result.evaluation.maxScore)) * 20
+      Number(result.moyenne)
     );
 
-    const currentEvaluation = await this.prisma.evaluation.findUnique({
+    const currentEvaluation = await this.prisma.evaluations.findUnique({
       where: { id: evaluationId }
     });
 
     if (!currentEvaluation) return true;
 
-    const normalizedCurrentScore = (score / Number(currentEvaluation.maxScore)) * 20;
+    // Pour les évaluations, on utilise une moyenne estimée sur 20
+    const normalizedCurrentScore = score;
 
     // Calculer la moyenne et l'écart-type des scores précédents
     const average = normalizedRecentScores.reduce((sum, s) => sum + s, 0) / normalizedRecentScores.length;

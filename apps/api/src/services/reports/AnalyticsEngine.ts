@@ -21,6 +21,7 @@ import {
   RecommendationCategory,
   RecommendationDifficulty
 } from '@edustats/shared/types';
+// TODO: Remplacer par des types locaux si le package n'existe pas
 
 /**
  * Moteur d'analyse avancée avec algorithmes de classification d'élèves

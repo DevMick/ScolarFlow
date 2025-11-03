@@ -2,7 +2,7 @@
 // SERVICE POUR LES ÉLÈVES
 // ========================================
 
-import { PrismaClient, Student, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { Logger } from '../utils/logger';
 
 export interface CreateStudentData {
