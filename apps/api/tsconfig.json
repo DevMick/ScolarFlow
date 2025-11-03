@@ -27,7 +27,6 @@
     "allowUnusedLabels": true,
     "allowUnreachableCode": true,
     "skipLibCheck": true,
-    "suppressImplicitAnyIndexErrors": true,
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
