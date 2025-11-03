@@ -58,7 +58,7 @@ export const prisma = new PrismaClient({
 // ========================================
 
 // Helmet - En-têtes de sécurité HTTP
-app.use(helmet(helmetConfig));
+app.use(helmet(helmetConfig as any));
 
 // En-têtes de sécurité supplémentaires
 app.use(additionalSecurityHeaders);

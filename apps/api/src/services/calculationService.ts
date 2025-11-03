@@ -180,7 +180,7 @@ export class CalculationService {
       const absentHandling = ((evaluation as any).absentHandling || 'exclude') as AbsentHandling;
       
       // Préparer les données pour le classement
-      const studentScores: StudentScore[] = evaluation.results.map(result => ({
+      const studentScores: StudentScore[] = ((evaluation as any).results || []).map((result: any) => ({
         studentId: result.studentId,
         student: result.student!,
         score: result.score ? Number(result.score) : undefined,
