@@ -1,0 +1,22 @@
+# Copier ce fichier vers .env pour la configuration
+# Choisissez la configuration selon votre environnement (local ou Aiven)
+
+# ============================================
+# CONFIGURATION POUR BASE DE DONNÉES LOCALE
+# ============================================
+# DATABASE_URL="postgresql://postgres:DevMick@2003@localhost:5432/edustats_db"
+# NODE_ENV="development"
+
+# ============================================
+# CONFIGURATION POUR BASE DE DONNÉES AIVEN (Production)
+# ============================================
+DATABASE_URL="postgresql://avnadmin:VOTRE_MOT_DE_PASSE_AIVEN@pg-XXXXXX-allianceconsultants893-23db.h.aivencloud.com:17875/defaultdb?sslmode=require"
+NODE_ENV="production"
+
+# ============================================
+# CONFIGURATION COMMUNE
+# ============================================
+JWT_SECRET="your-super-secret-jwt-key-change-in-production-128-chars-minimum"
+JWT_REFRESH_SECRET="your-super-secret-refresh-jwt-key-change-in-production-128-chars-minimum"
+PORT=3001
+CORS_ORIGIN="http://localhost:3000"

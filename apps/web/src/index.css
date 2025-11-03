@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+  }
+  
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+  
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+  }
+}
+
+/* Personnalisation du Select Ant Design pour le formulaire d'inscription */
+.ant-select-custom .ant-select-selector {
+  border-radius: 0.75rem !important;
+  border: 1px solid rgb(209, 213, 219) !important;
+  padding: 0.5rem 1rem !important;
+  height: 48px !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+  transition: all 0.2s !important;
+}
+
+.ant-select-custom .ant-select-selector:hover {
+  border-color: rgb(59, 130, 246) !important;
+}
+
+.ant-select-custom.ant-select-focused .ant-select-selector {
+  border-color: rgb(59, 130, 246) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+
+.ant-select-custom .ant-select-selection-placeholder {
+  color: rgb(156, 163, 175) !important;
+  font-size: 0.875rem !important;
+}
+
+.ant-select-custom .ant-select-selection-item {
+  display: flex !important;
+  align-items: center !important;
+  font-size: 0.875rem !important;
+}
+
+/* Style d'erreur pour le Select */
+.ant-select-error .ant-select-selector {
+  border-color: rgb(252, 165, 165) !important;
+}
+
+.ant-select-error.ant-select-focused .ant-select-selector {
+  border-color: rgb(239, 68, 68) !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* Personnalisation de l'accordéon pour les exigences du mot de passe */
+.ant-collapse-ghost > .ant-collapse-item {
+  border: 1px solid rgb(229, 231, 235) !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+}
+
+.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-header {
+  padding: 8px 12px !important;
+  background-color: rgb(249, 250, 251) !important;
+  border-radius: 0.5rem !important;
+}
+
+.ant-collapse-ghost > .ant-collapse-item.ant-collapse-item-active > .ant-collapse-header {
+  background-color: rgb(239, 246, 255) !important;
+  border-bottom: 1px solid rgb(219, 234, 254) !important;
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+}
+
+.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content {
+  background-color: white !important;
+  border-top: none !important;
+}
+
+.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
+  padding: 12px !important;
+}
+
+/* Personnalisation des messages Ant Design */
+.ant-message {
+  z-index: 9999 !important;
+}
+
+.ant-message-notice-content {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  padding: 16px 24px !important;
+}
+
+.ant-message-success .anticon {
+  font-size: 20px !important;
+}
+
+.ant-message-error .anticon {
+  font-size: 20px !important;
+}

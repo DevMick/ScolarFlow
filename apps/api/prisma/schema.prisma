@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model admins {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  password   String
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime
+
+  @@index([is_active])
+  @@index([username])
+}
+
+model class_average_configs {
+  id         Int      @id @default(autoincrement())
+  class_id   Int
+  user_id    Int
+  divisor    Decimal  @db.Decimal(5, 2)
+  formula    String
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime
+  classes    classes  @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([class_id, user_id])
+  @@index([class_id])
+  @@index([user_id])
+}
+
+model class_thresholds {
+  id                   Int      @id @default(autoincrement())
+  class_id             Int      @unique
+  user_id              Int
+  moyenne_admission    Decimal  @db.Decimal(5, 2)
+  moyenne_redoublement Decimal  @db.Decimal(5, 2)
+  max_note             Int
+  created_at           DateTime @default(now())
+  updated_at           DateTime
+  classes              classes  @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  users                users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([class_id])
+  @@index([user_id])
+}
+
+model classes {
+  id                    Int                     @id @default(autoincrement())
+  user_id               Int
+  name                  String
+  is_active             Boolean                 @default(true)
+  created_at            DateTime                @default(now())
+  updated_at            DateTime
+  class_average_configs class_average_configs[]
+  class_thresholds      class_thresholds?
+  users                 users                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  evaluations           evaluations[]
+  students              students[]
+  subjects              subjects[]
+
+  @@index([user_id])
+}
+
+model compte_gratuit {
+  id         Int      @id @default(autoincrement())
+  user_id    Int      @unique
+  date_debut DateTime @default(now())
+  date_fin   DateTime
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([date_debut])
+  @@index([is_active])
+  @@index([user_id])
+}
+
+model evaluation_formulas {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(200)
+  formula    String
+  created_at DateTime @default(now())
+  updated_at DateTime
+  user_id    Int
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}
+
+model evaluations {
+  id             Int          @id @default(autoincrement())
+  class_id       Int
+  created_at     DateTime     @default(now())
+  updated_at     DateTime
+  date           DateTime     @db.Date
+  nom            String       @db.VarChar(200)
+  school_year_id Int
+  classes        classes      @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  school_years   school_years @relation(fields: [school_year_id], references: [id], onDelete: Cascade)
+  moyennes       moyennes[]
+  notes          notes[]
+
+  @@index([class_id])
+  @@index([date])
+  @@index([school_year_id])
+}
+
+model moyennes {
+  id            Int         @id @default(autoincrement())
+  student_id    Int
+  evaluation_id Int
+  user_id       Int
+  moyenne       Decimal     @db.Decimal(5, 2)
+  date          DateTime    @db.Date
+  is_active     Boolean     @default(true)
+  created_at    DateTime    @default(now())
+  updated_at    DateTime
+  evaluations   evaluations @relation(fields: [evaluation_id], references: [id], onDelete: Cascade)
+  students      students    @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  users         users       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([date])
+  @@index([evaluation_id])
+  @@index([is_active])
+  @@index([student_id])
+  @@index([user_id])
+}
+
+model notes {
+  id            Int         @id @default(autoincrement())
+  student_id    Int
+  subject_id    Int
+  evaluation_id Int
+  user_id       Int
+  value         Decimal     @db.Decimal(5, 2)
+  is_absent     Boolean     @default(false)
+  is_active     Boolean     @default(true)
+  created_at    DateTime    @default(now())
+  updated_at    DateTime
+  evaluations   evaluations @relation(fields: [evaluation_id], references: [id], onDelete: Cascade)
+  students      students    @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  subjects      subjects    @relation(fields: [subject_id], references: [id], onDelete: Cascade)
+  users         users       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([evaluation_id])
+  @@index([is_active])
+  @@index([student_id])
+  @@index([subject_id])
+  @@index([user_id])
+}
+
+model paiements {
+  id                    Int       @id @default(autoincrement())
+  user_id               Int
+  date_paiement         DateTime  @default(now())
+  is_paid               Boolean   @default(false)
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+  screenshot            Bytes?
+  screenshot_type       String?
+  date_debut_abonnement DateTime?
+  date_fin_abonnement   DateTime?
+  montant               Decimal?  @db.Decimal(10, 2)
+  type_abonnement       String?   @default("annuel")
+  users                 users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([date_fin_abonnement])
+  @@index([date_paiement])
+  @@index([is_paid])
+  @@index([user_id])
+}
+
+model school_years {
+  id          Int           @id @default(autoincrement())
+  user_id     Int
+  start_year  Int
+  end_year    Int
+  is_active   Boolean       @default(false)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime
+  evaluations evaluations[]
+  users       users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  students    students[]
+
+  @@unique([user_id, start_year, end_year])
+  @@index([is_active])
+  @@index([user_id])
+}
+
+model students {
+  id             Int          @id @default(autoincrement())
+  class_id       Int
+  name           String
+  gender         String
+  student_number String?
+  is_active      Boolean      @default(true)
+  created_at     DateTime     @default(now())
+  updated_at     DateTime
+  school_year_id Int
+  moyennes       moyennes[]
+  notes          notes[]
+  classes        classes      @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  school_years   school_years @relation(fields: [school_year_id], references: [id], onDelete: Cascade)
+
+  @@index([school_year_id])
+}
+
+model subjects {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  created_at DateTime @default(now())
+  updated_at DateTime
+  class_id   Int
+  user_id    Int
+  notes      notes[]
+  classes    classes  @relation(fields: [class_id], references: [id], onDelete: Cascade)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([class_id, name])
+  @@index([class_id])
+  @@index([user_id])
+}
+
+model users {
+  id                    Int                     @id @default(autoincrement())
+  email                 String                  @unique
+  password_hash         String
+  first_name            String
+  last_name             String
+  establishment         String?
+  is_active             Boolean                 @default(true)
+  created_at            DateTime                @default(now())
+  updated_at            DateTime                @updatedAt
+  direction_regionale   String
+  gender                String?
+  secteur_pedagogique   String
+  class_average_configs class_average_configs[]
+  class_thresholds      class_thresholds[]
+  classes               classes[]
+  compte_gratuit        compte_gratuit?
+  evaluation_formulas   evaluation_formulas[]
+  moyennes              moyennes[]
+  notes                 notes[]
+  paiements             paiements[]
+  school_years          school_years[]
+  subjects              subjects[]
+}

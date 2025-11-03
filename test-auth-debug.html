@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Authentification EduStats</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1890ff; }
+        h2 { color: #333; margin-top: 0; }
+        button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover { background: #40a9ff; }
+        button.danger {
+            background: #ff4d4f;
+        }
+        button.danger:hover { background: #ff7875; }
+        .info { 
+            background: #e6f7ff; 
+            border: 1px solid #91d5ff; 
+            padding: 15px; 
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .error { 
+            background: #fff2f0; 
+            border: 1px solid #ffccc7; 
+            padding: 15px; 
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { 
+            background: #f6ffed; 
+            border: 1px solid #b7eb8f; 
+            padding: 15px; 
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 Debug Authentification EduStats</h1>
+    
+    <div class="card">
+        <h2>État actuel de l'authentification</h2>
+        <div id="status"></div>
+        <button onclick="checkStatus()">🔄 Rafraîchir l'état</button>
+    </div>
+
+    <div class="card">
+        <h2>Actions</h2>
+        <button onclick="clearAuth()">🗑️ Nettoyer l'authentification</button>
+        <button onclick="goToLogin()">🔑 Aller à la page de connexion</button>
+        <button onclick="goToApp()">🏠 Retourner à l'application</button>
+    </div>
+
+    <div class="card">
+        <h2>Détails techniques</h2>
+        <div id="details"></div>
+    </div>
+
+    <script>
+        function checkStatus() {
+            const token = localStorage.getItem('auth_token');
+            const userData = localStorage.getItem('user_data');
+            const statusDiv = document.getElementById('status');
+            const detailsDiv = document.getElementById('details');
+
+            if (token && userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    statusDiv.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Authentifié</strong><br>
+                            Email: ${user.email}<br>
+                            Nom: ${user.firstName} ${user.lastName}
+                        </div>
+                    `;
+                    detailsDiv.innerHTML = `
+                        <p><strong>Token:</strong></p>
+                        <pre>${token.substring(0, 50)}...</pre>
+                        <p><strong>Données utilisateur:</strong></p>
+                        <pre>${JSON.stringify(user, null, 2)}</pre>
+                    `;
+                } catch (e) {
+                    statusDiv.innerHTML = `
+                        <div class="error">
+                            <strong>⚠️ Données corrompues</strong><br>
+                            Le token existe mais les données utilisateur sont invalides.
+                        </div>
+                    `;
+                    detailsDiv.innerHTML = `<pre>${e.message}</pre>`;
+                }
+            } else if (token && !userData) {
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <strong>⚠️ État incohérent</strong><br>
+                        Token présent mais pas de données utilisateur.
+                    </div>
+                `;
+                detailsDiv.innerHTML = `
+                    <p><strong>Token:</strong></p>
+                    <pre>${token.substring(0, 50)}...</pre>
+                    <p><strong>Données utilisateur:</strong> Absentes</p>
+                `;
+            } else {
+                statusDiv.innerHTML = `
+                    <div class="info">
+                        <strong>❌ Non authentifié</strong><br>
+                        Aucune session active détectée.
+                    </div>
+                `;
+                detailsDiv.innerHTML = `<p>Aucune donnée d'authentification trouvée dans le localStorage.</p>`;
+            }
+        }
+
+        function clearAuth() {
+            if (confirm('Êtes-vous sûr de vouloir nettoyer toutes les données d\'authentification ?')) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_data');
+                alert('✅ Authentification nettoyée avec succès !');
+                checkStatus();
+            }
+        }
+
+        function goToLogin() {
+            window.location.href = 'http://localhost:5173/login';
+        }
+
+        function goToApp() {
+            window.location.href = 'http://localhost:5173/';
+        }
+
+        // Vérifier au chargement
+        checkStatus();
+    </script>
+</body>
+</html>
+

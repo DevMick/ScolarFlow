@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm install && pnpm build",
+  "installCommand": "pnpm install",
+  "devCommand": "pnpm dev",
+  "framework": null,
+  "projects": [
+    {
+      "name": "api",
+      "source": "apps/api",
+      "buildCommand": "cd apps/api && pnpm build",
+      "outputDirectory": "apps/api/dist",
+      "devCommand": "cd apps/api && pnpm dev",
+      "installCommand": "pnpm install"
+    },
+    {
+      "name": "web",
+      "source": "apps/web",
+      "buildCommand": "cd apps/web && pnpm build",
+      "outputDirectory": "apps/web/dist",
+      "devCommand": "cd apps/web && pnpm dev",
+      "installCommand": "pnpm install"
+    }
+  ]
+}
+

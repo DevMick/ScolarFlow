@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{pageTitle}}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ===== Reset & gabarit ===== */
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{background:#fff;font-family:Arial,Helvetica,sans-serif;color:#000}
+    .print-container{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:15mm}
+
+    /* ===== ENTÊTE ===== */
+    .header-top{
+      display:flex;justify-content:space-between;align-items:flex-start;
+      font-size:10pt;line-height:1.4;margin-bottom:2mm;text-transform:uppercase
+    }
+    .header-left{ text-align:left; max-width:60% }
+    .header-right{ text-align:right }
+    .dashes{ letter-spacing:1px }
+    .motto{ font-style:italic }
+
+    /* Ligne établissement + année (collée sous “INSPECTION...”) */
+    .ecole-annee {
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      font-size:10pt;
+      line-height:1.4;
+      text-transform:uppercase;
+      width:100%;
+    }
+    .ecole-label{ flex:1; text-align:left }
+    .annee-scolaire{ font-weight:bold; white-space:nowrap; text-align:right }
+
+    /* Ligne de tirets + EPP */
+    .ecole-ligne{ font-size:10pt;text-transform:uppercase;margin-top:2mm;margin-bottom:2mm }
+
+    /* Infos classe sous EPP */
+    .classe-info{ font-size:10pt;margin-bottom:4mm;text-transform:none }
+
+    /* Code école (si utilisé séparément) */
+    .code-ecole{ font-size:11pt;font-weight:bold;margin-bottom:2mm;text-decoration:underline }
+
+    /* ===== Titre évaluation ===== */
+    .evaluation-title{
+      text-align:center;font-size:13pt;font-weight:bold;text-transform:uppercase;
+      text-decoration:underline;text-underline-offset:3px;letter-spacing:.3px;margin-bottom:5mm
+    }
+
+    /* ==========================================================
+       STYLE DES BORDURES DU TABLEAU
+       ----------------------------------------------------------
+       Type : bordures simples fines (style Word)
+       Description :
+       - Lignes noires continues et uniformes
+       - Épaisseur très fine (environ 0.2pt ou 0.3px)
+       - Même rendu qu'un tableau Word classique
+       Objectif :
+       - Donner un aspect professionnel et épuré à l'impression
+       - Éviter les bordures épaisses ou grises
+       ========================================================== */
+    
+    /* ===== Tableau des notes ===== */
+    .table-container{ width:100%; margin-top:2mm }
+    table.grades-table{ width:100%; border-collapse:collapse; font-size:8pt }
+    .grades-table th,.grades-table td{ border:1px solid #000; padding:3px 2px; text-align:center }
+    .grades-table th{ background:none; font-weight:bold; font-size:7pt }
+    .student-number{ width:25px }
+    .student-name{ text-align:left !important; padding-left:5px }
+    .grades-table tr:nth-child(even){ background:#fff }
+    .total-grade,.average-grade{ font-weight:bold }
+
+    /* ===== Statistiques ===== */
+    .statistics-section{ background:#fff; padding:10mm 0 0; margin-top:6mm }
+    .statistics-title{ font-size:16px; font-weight:700; text-align:center; margin-bottom:4mm }
+    .stats-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px }
+    .stat-item{ background:#fff; padding:10px; text-align:center; border:1px solid #eee }
+    .stat-value{ font-size:22px; font-weight:700; margin-bottom:2px }
+    .stat-label{ font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:.3px }
+
+    /* ===== Pied ===== */
+    .footer-info{ margin-top:10mm; text-align:center; font-size:11px }
+
+    /* ===== Impression ===== */
+    @media print{
+      .print-container{ width:auto; min-height:auto; padding:10mm }
+      .grades-table{ page-break-inside:avoid }
+      .grades-table th,.grades-table td{ border:1px solid #000 !important }
+      .statistics-section{ page-break-before:avoid }
+    }
+  </style>
+</head>
+<body>
+  <div class="print-container">
+
+    <!-- ===== ENTÊTE (gauche/droite) ===== -->
+    <div class="header-top">
+      <div class="header-left">
+        MINISTERE DE L'EDUCATION NATIONALE<br>
+        ET DE L'ALPHABETISATION<br>
+        <span class="dashes">-----------</span><br>
+        DIRECTION REGIONALE {{directionRegionalLabel}}<br>
+        <span class="dashes">-----------</span><br>
+        INSPECTION DE L'ENSEIGNEMENT<br>
+         PRESCOLAIRE ET PRIMAIRE {{inspectionLabel}}
+       </div>
+       <div class="header-right">
+         REPUBLIQUE DE CÔTE D'IVOIRE<br>
+         <span class="dashes">-----------</span><br>
+         <span class="motto">UNION - DISCIPLINE - TRAVAIL</span><br>
+         <br>
+         <br>
+         <br>
+         ANNEE SCOLAIRE : {{schoolYear}}
+       </div>
+    </div>
+
+    <!-- ===== Ligne EPP ===== -->
+    <div class="ecole-ligne">
+      EPP : {{schoolShortName}}
+    </div>
+
+    <!-- ===== Infos classe ===== -->
+    <div class="classe-info">
+      Secteur Pédagogique : {{sectorName}} &nbsp;&nbsp;
+      Cours : {{classData.name}} &nbsp;&nbsp;
+      Maître : {{classData.user.firstName}} {{classData.user.lastName}}
+    </div>
+
+    <!-- ===== Titre évaluation ===== -->
+    <div class="evaluation-title">
+      EVALUATION N°{{evaluationData.numero}} DU {{formatDate evaluationData.date}}
+    </div>
+
+    <!-- ===== Tableau des notes ===== -->
+    <div class="table-container">
+      <table class="grades-table">
+        <thead>
+          <tr>
+            <th class="student-number">N°</th>
+            <th>Nom et Prénoms</th>
+            <th>Sexe</th>
+            {{#each subjects}}
+              <th>{{name}}</th>
+            {{/each}}
+            <th>TOTAL</th>
+            <th>MOY</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each studentsData}}
+          <tr>
+            <td class="student-number">
+              {{#if (lt @index 9)}}0{{add @index 1}}{{else}}{{add @index 1}}{{/if}}
+            </td>
+            <td class="student-name">{{student.name}}</td>
+            <td>{{student.gender}}</td>
+
+            {{#each ../subjects}}
+              <td>
+                {{#if (lookup ../notes id)}}
+                  {{formatNumber (lookup ../notes id) 0}}
+                {{else}}-{{/if}}
+              </td>
+            {{/each}}
+
+            <td class="total-grade">{{formatNumber total 0}}</td>
+            <td class="average-grade">{{formatNumber moyenne 2}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== Statistiques (optionnelles) ===== -->
+    {{#if statistics}}
+    <div class="statistics-section">
+      <h3 class="statistics-title">📊 Statistiques de la classe</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{formatNumber statistics.moyenneClasse 2}}</div>
+          <div class="stat-label">Moyenne de classe</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{formatNumber statistics.moyenneMax 2}}</div>
+          <div class="stat-label">Meilleure moyenne</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{formatNumber statistics.moyenneMin 2}}</div>
+          <div class="stat-label">Moyenne la plus faible</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{statistics.nombreAdmis}}</div>
+          <div class="stat-label">Nombre d'admis</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{statistics.nombreNonAdmis}}</div>
+          <div class="stat-label">Nombre de non-admis</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{../studentsData.length}}</div>
+          <div class="stat-label">Total élèves</div>
+        </div>
+      </div>
+    </div>
+    {{/if}}
+
+    <!-- ===== Pied de page ===== -->
+    <div class="footer-info">
+      <!-- Contenu pied de page si besoin -->
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test d'affichage d'image</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .log {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test d'affichage d'image - API ScolarFlow</h1>
+    
+    <div class="test-section info">
+        <h2>🔍 Test de récupération d'image</h2>
+        <p>Ce test vérifie si l'image peut être récupérée et affichée depuis l'API.</p>
+        <button onclick="testImageRetrieval()">Tester la récupération d'image</button>
+        <div id="imageResult"></div>
+    </div>
+    
+    <div class="test-section info">
+        <h2>📊 Logs de test</h2>
+        <div id="logs" class="log"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoibWlja2FlbC5hbmRqdWkuMTJAZ21haWwuY29tIiwiaWF0IjoxNzYxMzgwODUyLCJleHAiOjE3NjE0NjcyNTIsImF1ZCI6ImVkdXN0YXRzLXVzZXJzIiwiaXNzIjoiZWR1c3RhdHMifQ.wQgewWBcadIClduTbvGYWaeKbjrSdk-7gjC_6iK-A58';
+        
+        function log(message) {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsDiv.textContent += `[${timestamp}] ${message}\n`;
+        }
+        
+        async function testImageRetrieval() {
+            log('🧪 Début du test de récupération d\'image...');
+            
+            try {
+                // Test 1: Récupérer l'image
+                log('📡 Récupération de l\'image depuis l\'API...');
+                const response = await fetch(`${API_BASE}/payments/5/screenshot`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${TOKEN}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                log(`✅ Image récupérée avec succès!`);
+                log(`Content-Type: ${response.headers.get('content-type')}`);
+                log(`Content-Length: ${response.headers.get('content-length')}`);
+                
+                // Test 2: Convertir en blob et créer URL
+                log('🔄 Conversion en blob...');
+                const blob = await response.blob();
+                const imageUrl = URL.createObjectURL(blob);
+                
+                log(`✅ Blob créé: ${blob.size} bytes, type: ${blob.type}`);
+                log(`✅ URL d'image créée: ${imageUrl}`);
+                
+                // Test 3: Afficher l'image
+                log('🖼️ Affichage de l\'image...');
+                const imageResult = document.getElementById('imageResult');
+                imageResult.innerHTML = `
+                    <div class="success">
+                        <h3>✅ Image récupérée et affichée avec succès!</h3>
+                        <p>Taille: ${blob.size} bytes</p>
+                        <p>Type: ${blob.type}</p>
+                        <img src="${imageUrl}" alt="Image récupérée" />
+                    </div>
+                `;
+                
+                log('✅ Test terminé avec succès!');
+                
+            } catch (error) {
+                log(`❌ Erreur: ${error.message}`);
+                document.getElementById('imageResult').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Erreur lors de la récupération</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Test automatique au chargement
+        window.onload = function() {
+            log('🚀 Page de test chargée');
+            log('Cliquez sur "Tester la récupération d\'image" pour commencer');
+        };
+    </script>
+</body>
+</html>
