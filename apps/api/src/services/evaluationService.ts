@@ -4,8 +4,8 @@ import { CreateEvaluationSimpleData, UpdateEvaluationSimpleData, EvaluationSimpl
 export class EvaluationService {
   private prisma: PrismaClient;
 
-  constructor() {
-    this.prisma = new PrismaClient();
+  constructor(prisma?: PrismaClient, calculationService?: any, validationService?: any) {
+    this.prisma = prisma || new PrismaClient();
   }
 
   // Récupérer toutes les évaluations d'une classe

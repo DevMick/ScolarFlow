@@ -63,7 +63,7 @@ export class ExportsService {
         id: 0,
         class_id: classId,
         user_id: classData.user_id,
-        divisor: subjects.length,
+        divisor: { value: subjects.length.toString() } as any,
         formula: `=(${subjectNames}) ÷ ${subjects.length}`,
         isActive: true,
         createdAt: new Date(),

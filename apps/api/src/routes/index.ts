@@ -100,7 +100,7 @@ export async function createApiRoutes(prisma: PrismaClient): Promise<Router> {
   const { StatisticsEngine } = await import('../services/statistics/StatisticsEngine');
   const { EvaluationService } = await import('../services/evaluationService');
   const statisticsEngine = new StatisticsEngine(prisma);
-  const evaluationService = new EvaluationService(prisma);
+  const evaluationService = new EvaluationService();
   router.use('/reports', createReportsRoutes(prisma, statisticsEngine, evaluationService));
 
   // ========================================

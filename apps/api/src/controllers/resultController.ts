@@ -175,6 +175,7 @@ export class ResultController {
         evaluationId,
         studentId,
         {
+          studentId,
           score: data.score,
           isAbsent: data.isAbsent || false,
           absentReason: data.absentReason,

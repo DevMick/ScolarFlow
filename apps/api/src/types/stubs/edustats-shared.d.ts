@@ -128,6 +128,12 @@ declare module '@edustats/shared/types' {
   export type InsightType = any;
   export type Priority = any;
   export type ProgressionTrend = any;
+  export const StudentProfileType: any;
+  export const InsightType: any;
+  export const Priority: any;
+  export const ProgressionTrend: any;
+  export const RecommendationDifficulty: any;
+  export const RecommendationCategory: any;
   export type AnalyticsConfig = any;
   export type AnalyticsResult = any;
   export type PedagogicalRecommendation = any;
@@ -148,6 +154,12 @@ declare module '@edustats/shared/validation' {
   export type updateCustomTableSchema = any;
   export type exportTableSchema = any;
   export type createTemplateSchema = any;
+  export const updateEvaluationResultSchema: any;
+  export const bulkResultsSchema: any;
+  export const createCustomTableSchema: any;
+  export const updateCustomTableSchema: any;
+  export const exportTableSchema: any;
+  export const createTemplateSchema: any;
 }
 
 declare module '@edustats/shared/types/statistics' {
