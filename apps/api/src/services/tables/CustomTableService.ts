@@ -44,21 +44,6 @@ export class CustomTableService {
 
       // TODO: customTable n'existe pas dans le schéma Prisma
       throw new Error('customTable model not available in Prisma schema');
-      /* const table = await this.prisma.customTable.create({
-        data: {
-          userId,
-          classId: data.classId,
-          name: data.name,
-          description: data.description,
-          category: data.category,
-          config: data.config as any,
-          isTemplate: data.isTemplate || false,
-          isPublic: data.isPublic || false,
-          tags: data.tags || []
-        }
-      });
-
-      return this.mapPrismaToCustomTable(table); */
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la création du tableau', error);
@@ -72,24 +57,6 @@ export class CustomTableService {
     try {
       // TODO: customTable n'existe pas dans le schéma Prisma
       throw new Error('customTable model not available in Prisma schema');
-      /* const table = await this.prisma.customTable.findUnique({
-        where: { id: parseInt(tableId) },
-        include: {
-          users: { select: { first_name: true, last_name: true } },
-          class: { select: { name: true, level: true } }
-        }
-      });
-
-      if (!table) {
-        throw new NotFoundError('Tableau non trouvé');
-      }
-
-      // Vérifier les permissions
-      if (table.userId !== userId && !table.isPublic) {
-        throw new ForbiddenError('Accès non autorisé à ce tableau');
-      }
-
-      return this.mapPrismaToCustomTable(table);
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la récupération du tableau', error);
@@ -131,21 +98,9 @@ export class CustomTableService {
         ];
       }
 
-      const [tables, total] = await Promise.all([
-        // TODO: customTable n'existe pas dans le schéma Prisma
-        // this.prisma.customTable.findMany({
-          where,
-          include: {
-            users: { select: { first_name: true, last_name: true } },
-            class: { select: { name: true, level: true } }
-          },
-          orderBy: { updatedAt: 'desc' },
-          skip,
-          take: limit
-        }),
-        // TODO: customTable n'existe pas dans le schéma Prisma
-        // this.prisma.customTable.count({ where })
-      ]);
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      const tables: any[] = [];
+      const total = 0;
 
       return {
         tables: tables.map(table => this.mapPrismaToCustomTable(table)),
@@ -167,22 +122,6 @@ export class CustomTableService {
     try {
       // TODO: customTable n'existe pas dans le schéma Prisma
       const existingTable: any = null;
-      /* const existingTable = await this.prisma.customTable.findUnique({
-        where: { id: parseInt(tableId) }
-      });
-
-      if (!existingTable) {
-        throw new NotFoundError('Tableau non trouvé');
-      }
-
-      if (existingTable.userId !== userId) {
-        throw new ForbiddenError('Vous ne pouvez modifier que vos propres tableaux');
-      }
-
-      // Validation des nouvelles données
-      if (data.config) {
-        this.validateTableConfig(data.config);
-      }
 
       const updateData: any = {};
       if (data.name) updateData.name = data.name;
@@ -200,16 +139,6 @@ export class CustomTableService {
 
       // TODO: customTable n'existe pas dans le schéma Prisma
       throw new Error('customTable model not available');
-      /* const updatedTable = await this.prisma.customTable.update({
-        where: { id: parseInt(tableId) },
-        data: updateData,
-        include: {
-          users: { select: { first_name: true, last_name: true } },
-          class: { select: { name: true, level: true } }
-        }
-      });
-
-      return this.mapPrismaToCustomTable(updatedTable);
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la mise à jour du tableau', error);
@@ -223,23 +152,6 @@ export class CustomTableService {
     try {
       // TODO: customTable n'existe pas dans le schéma Prisma
       throw new Error('customTable model not available in Prisma schema');
-      /* const table = await this.prisma.customTable.findUnique({
-        where: { id: parseInt(tableId) }
-      });
-
-      if (!table) {
-        throw new NotFoundError('Tableau non trouvé');
-      }
-
-      if (table.userId !== userId) {
-        throw new ForbiddenError('Vous ne pouvez supprimer que vos propres tableaux');
-      }
-
-      // TODO: customTable n'existe pas dans le schéma Prisma
-      throw new Error('customTable model not available');
-      /* await this.prisma.customTable.delete({
-        where: { id: parseInt(tableId) }
-      });
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la suppression du tableau', error);
@@ -271,18 +183,6 @@ export class CustomTableService {
       // Mettre à jour le cache
       // TODO: customTable n'existe pas dans le schéma Prisma
       throw new Error('customTable model not available');
-      /* await this.prisma.customTable.update({
-        where: { id: parseInt(tableId) },
-        data: {
-          computedData: {
-            ...tableData,
-            calculatedAt: new Date(),
-            processingTime
-          } as any
-        }
-      });
-
-      return tableData;
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la génération des données', error);

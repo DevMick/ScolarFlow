@@ -50,22 +50,6 @@ export class ConfigurationService {
     try {
       // TODO: statisticsConfig n'existe pas dans le schéma Prisma
       throw new Error('statisticsConfig model not available in Prisma schema');
-      /* const config = await this.prisma.statisticsConfig.create({
-        data: {
-          userId,
-          name: data.name,
-          description: data.description,
-          category: data.category,
-          dataSources: data.dataSources as any,
-          calculations: data.calculations as any,
-          visualization: data.visualization as any,
-          isTemplate: data.isTemplate || false,
-          isPublic: data.isPublic || false,
-          tags: data.tags || []
-        }
-      });
-
-      return this.mapToStatisticConfiguration(config);
     } catch (error) {
       console.error('Erreur création configuration:', error);
       throw new Error('Erreur lors de la création de la configuration');
@@ -119,25 +103,6 @@ export class ConfigurationService {
       // TODO: statisticsConfig n'existe pas dans le schéma Prisma
       const configurations: any[] = [];
       const total = 0;
-      /* const [configurations, total] = await Promise.all([
-        this.prisma.statisticsConfig.findMany({
-          where: whereConditions,
-          skip,
-          take: limit,
-          orderBy: { [sortBy]: sortOrder },
-          include: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                email: true
-              }
-            }
-          }
-        }),
-        this.prisma.statisticsConfig.count({ where: whereConditions })
-      ]); */
 
       return {
         configurations: configurations.map(config => this.mapToStatisticConfiguration(config)),
@@ -199,36 +164,6 @@ export class ConfigurationService {
     try {
       // Vérifier que l'utilisateur est propriétaire de la configuration
       // TODO: statisticsConfig n'existe pas dans le schéma Prisma
-      const existingConfig: any = null;
-      /* const existingConfig = await this.prisma.statisticsConfig.findFirst({
-        where: { id: parseInt(id), userId }
-      });
-
-      if (!existingConfig) {
-        throw new Error('Configuration non trouvée ou accès non autorisé');
-      }
-
-      // TODO: statisticsConfig n'existe pas dans le schéma Prisma
-      throw new Error('statisticsConfig model not available');
-      /* const updatedConfig = await this.prisma.statisticsConfig.update({
-        where: { id: parseInt(id) },
-        data: {
-          ...data.name && { name: data.name },
-          ...data.description && { description: data.description },
-          ...data.category && { category: data.category },
-          ...data.dataSources && { dataSources: data.dataSources as any },
-          ...data.calculations && { calculations: data.calculations as any },
-          ...data.visualization && { visualization: data.visualization as any },
-          ...data.isTemplate !== undefined && { isTemplate: data.isTemplate },
-          ...data.isPublic !== undefined && { isPublic: data.isPublic },
-          ...data.tags && { tags: data.tags },
-          // Réinitialiser le cache si la configuration change
-          lastResult: null,
-          lastGenerated: null
-        }
-      }); */
-
-      // TODO: updatedConfig n'est plus disponible car statisticsConfig n'existe pas
       throw new Error('statisticsConfig model not available');
       // return this.mapToStatisticConfiguration(updatedConfig);
     } catch (error) {
@@ -244,20 +179,7 @@ export class ConfigurationService {
     try {
       // Vérifier que l'utilisateur est propriétaire de la configuration
       // TODO: statisticsConfig n'existe pas dans le schéma Prisma
-      const existingConfig: any = null;
-      /* const existingConfig = await this.prisma.statisticsConfig.findFirst({
-        where: { id: parseInt(id), userId }
-      });
-
-      if (!existingConfig) {
-        throw new Error('Configuration non trouvée ou accès non autorisé');
-      }
-
-      // TODO: statisticsConfig n'existe pas dans le schéma Prisma
       throw new Error('statisticsConfig model not available');
-      /* await this.prisma.statisticsConfig.delete({
-        where: { id: parseInt(id) }
-      });
     } catch (error) {
       console.error('Erreur suppression configuration:', error);
       throw new Error('Erreur lors de la suppression de la configuration');
@@ -299,31 +221,6 @@ export class ConfigurationService {
   async getTemplates(): Promise<StatisticConfiguration[]> {
     try {
       // TODO: statisticsConfig n'existe pas dans le schéma Prisma
-      const templates: any[] = [];
-      /* const templates = await this.prisma.statisticsConfig.findMany({
-        where: {
-          OR: [
-            { isTemplate: true, isPublic: true },
-            { isTemplate: true } // Pour les templates système
-          ]
-        },
-        orderBy: [
-          { isPublic: 'desc' }, // Templates publics en premier
-          { updatedAt: 'desc' }
-        ],
-        include: {
-          user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true
-            }
-          }
-        }
-      }); */
-
-      // TODO: templates n'est plus disponible car statisticsConfig n'existe pas
       return [];
     } catch (error) {
       console.error('Erreur récupération templates:', error);
@@ -373,13 +270,6 @@ export class ConfigurationService {
     try {
       // TODO: statisticsConfig n'existe pas dans le schéma Prisma
       throw new Error('statisticsConfig model not available');
-      /* await this.prisma.statisticsConfig.update({
-        where: { id: parseInt(id) },
-        data: {
-          lastResult: result,
-          lastGenerated: new Date()
-        }
-      });
     } catch (error) {
       console.error('Erreur mise à jour cache:', error);
       // Ne pas propager l'erreur, le cache n'est pas critique
@@ -393,32 +283,7 @@ export class ConfigurationService {
     try {
       // Vérifier si les templates système existent déjà
       // TODO: statisticsConfig n'existe pas dans le schéma Prisma
-      const existingTemplates = 0;
-      /* const existingTemplates = await this.prisma.statisticsConfig.count({
-        where: { isTemplate: true, userId: 1 } // User ID 1 pour les templates système
-      });
-
-      if (existingTemplates === 0) {
-        // Créer les templates système depuis les données partagées
-        for (const template of statisticsTemplates) {
-          // TODO: statisticsConfig n'existe pas dans le schéma Prisma
-          // await this.prisma.statisticsConfig.create({
-            data: {
-              userId: 1, // User système
-              name: template.name,
-              description: template.description,
-              category: template.category,
-              dataSources: template.dataSources as any,
-              calculations: template.calculations as any,
-              visualization: template.visualization as any,
-              isTemplate: true,
-              isPublic: true,
-              tags: template.tags
-            }
-          });
-        }
-        console.log('Templates système initialisés');
-      }
+      // Les templates système ne peuvent pas être initialisés sans le modèle Prisma
     } catch (error) {
       console.error('Erreur initialisation templates système:', error);
     }

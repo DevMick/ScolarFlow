@@ -195,7 +195,7 @@ export class StatisticsEngine {
   /**
    * Applique les filtres aux données
    */
-  private applyFilters(data: RawEvaluationData[], dataSources: StatisticConfiguration['dataSources']): RawEvaluationData[] {
+  private applyFilters(data: RawEvaluationData[], dataSources: any): RawEvaluationData[] {
     let filtered = [...data];
 
     // Exclure les absents si demandé

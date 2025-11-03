@@ -30,18 +30,6 @@ export class TemplateService {
 
       // TODO: customTableTemplate n'existe pas dans le schéma Prisma
       throw new Error('customTableTemplate model not available in Prisma schema');
-      /* const template = await this.prisma.customTableTemplate.create({
-        data: {
-          name: data.name,
-          description: data.description,
-          category: data.category,
-          config: data.config as any,
-          createdBy: userId,
-          tags: data.tags || []
-        }
-      });
-
-      return this.mapPrismaToTemplate(template);
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la création du template', error);
@@ -86,24 +74,9 @@ export class TemplateService {
         ];
       }
 
-      const [templates, total] = await Promise.all([
-        // TODO: customTableTemplate n'existe pas dans le schéma Prisma
-        // this.prisma.customTableTemplate.findMany({
-          where,
-          include: {
-            creator: { select: { firstName: true, lastName: true } }
-          },
-          orderBy: [
-            { isOfficial: 'desc' },
-            { usageCount: 'desc' },
-            { createdAt: 'desc' }
-          ],
-          skip,
-          take: limit
-        }),
-        // TODO: customTableTemplate n'existe pas dans le schéma Prisma
-        // this.prisma.customTableTemplate.count({ where })
-      ]);
+      // TODO: customTableTemplate n'existe pas dans le schéma Prisma
+      const templates: any[] = [];
+      const total = 0;
 
       return {
         templates: templates.map(template => this.mapPrismaToTemplate(template)),
@@ -121,17 +94,9 @@ export class TemplateService {
     try {
       // TODO: customTableTemplate n'existe pas dans le schéma Prisma
       const template: any = null;
-      /* const template = await this.prisma.customTableTemplate.findUnique({
-        where: { id: parseInt(templateId) },
-        include: {
-          creator: { select: { firstName: true, lastName: true } }
-        }
-      });
-
       if (!template) {
         throw new NotFoundError('Template non trouvé');
       }
-
       return this.mapPrismaToTemplate(template);
     } catch (error) {
       if (error instanceof ServiceError) throw error;
@@ -149,38 +114,7 @@ export class TemplateService {
   ): Promise<CustomTableTemplate> {
     try {
       // TODO: customTableTemplate n'existe pas dans le schéma Prisma
-      const existingTemplate: any = null;
-      /* const existingTemplate = await this.prisma.customTableTemplate.findUnique({
-        where: { id: parseInt(templateId) }
-      });
-
-      if (!existingTemplate) {
-        throw new NotFoundError('Template non trouvé');
-      }
-
-      // Seuls les créateurs ou admins peuvent modifier
-      if (existingTemplate.createdBy !== userId && !existingTemplate.isOfficial) {
-        throw new ForbiddenError('Vous ne pouvez modifier que vos propres templates');
-      }
-
-      const updateData: any = {};
-      if (data.name) updateData.name = data.name;
-      if (data.description !== undefined) updateData.description = data.description;
-      if (data.category) updateData.category = data.category;
-      if (data.config) updateData.config = data.config;
-      if (data.tags) updateData.tags = data.tags;
-
-      // TODO: customTableTemplate n'existe pas dans le schéma Prisma
       throw new Error('customTableTemplate model not available');
-      /* const updatedTemplate = await this.prisma.customTableTemplate.update({
-        where: { id: parseInt(templateId) },
-        data: updateData,
-        include: {
-          creator: { select: { firstName: true, lastName: true } }
-        }
-      });
-
-      return this.mapPrismaToTemplate(updatedTemplate);
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la mise à jour du template', error);
@@ -193,25 +127,7 @@ export class TemplateService {
   async deleteTemplate(userId: number, templateId: string): Promise<void> {
     try {
       // TODO: customTableTemplate n'existe pas dans le schéma Prisma
-      const template: any = null;
-      /* const template = await this.prisma.customTableTemplate.findUnique({
-        where: { id: parseInt(templateId) }
-      });
-
-      if (!template) {
-        throw new NotFoundError('Template non trouvé');
-      }
-
-      // Seuls les créateurs peuvent supprimer (pas les templates officiels)
-      if (template.createdBy !== userId || template.isOfficial) {
-        throw new ForbiddenError('Vous ne pouvez supprimer que vos propres templates non officiels');
-      }
-
-      // TODO: customTableTemplate n'existe pas dans le schéma Prisma
       throw new Error('customTableTemplate model not available');
-      /* await this.prisma.customTableTemplate.delete({
-        where: { id: parseInt(templateId) }
-      });
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la suppression du template', error);
@@ -228,12 +144,6 @@ export class TemplateService {
       // Incrémenter le compteur d'utilisation
       // TODO: customTableTemplate n'existe pas dans le schéma Prisma
       throw new Error('customTableTemplate model not available');
-      /* await this.prisma.customTableTemplate.update({
-        where: { id: parseInt(templateId) },
-        data: { usageCount: { increment: 1 } }
-      });
-
-      return template.config;
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de l\'utilisation du template', error);
@@ -245,21 +155,8 @@ export class TemplateService {
    */
   async getPopularTemplates(limit = 10): Promise<CustomTableTemplate[]> {
     try {
-      const templates = await this.prisma.customTableTemplate.findMany({
-        where: {
-          OR: [
-            { isOfficial: true },
-            { usageCount: { gt: 0 } }
-          ]
-        },
-        include: {
-          creator: { select: { firstName: true, lastName: true } }
-        },
-        orderBy: { usageCount: 'desc' },
-        take: limit
-      });
-
-      return templates.map(template => this.mapPrismaToTemplate(template));
+      // TODO: customTableTemplate n'existe pas dans le schéma Prisma
+      return [];
     } catch (error) {
       throw new ServiceError('Erreur lors de la récupération des templates populaires', error);
     }
@@ -270,33 +167,8 @@ export class TemplateService {
    */
   async getTemplatesByCategory(): Promise<Record<string, CustomTableTemplate[]>> {
     try {
-      const templates = await this.prisma.customTableTemplate.findMany({
-        where: {
-          OR: [
-            { isOfficial: true },
-            { usageCount: { gt: 0 } }
-          ]
-        },
-        include: {
-          creator: { select: { firstName: true, lastName: true } }
-        },
-        orderBy: [
-          { isOfficial: 'desc' },
-          { usageCount: 'desc' }
-        ]
-      });
-
-      const templatesByCategory: Record<string, CustomTableTemplate[]> = {};
-
-      templates.forEach(template => {
-        const category = template.category || 'custom';
-        if (!templatesByCategory[category]) {
-          templatesByCategory[category] = [];
-        }
-        templatesByCategory[category].push(this.mapPrismaToTemplate(template));
-      });
-
-      return templatesByCategory;
+      // TODO: customTableTemplate n'existe pas dans le schéma Prisma
+      return {};
     } catch (error) {
       throw new ServiceError('Erreur lors de la récupération des templates par catégorie', error);
     }
@@ -316,29 +188,8 @@ export class TemplateService {
     }
   ): Promise<CustomTableTemplate> {
     try {
-      // Récupérer le tableau source
-      const sourceTable = await this.prisma.customTable.findUnique({
-        where: { id: parseInt(tableId) }
-      });
-
-      if (!sourceTable) {
-        throw new NotFoundError('Tableau source non trouvé');
-      }
-
-      if (sourceTable.userId !== userId) {
-        throw new ForbiddenError('Vous ne pouvez créer un template qu\'à partir de vos propres tableaux');
-      }
-
-      // Créer le template
-      const template = await this.createTemplate(userId, {
-        name: templateData.name,
-        description: templateData.description,
-        category: templateData.category,
-        config: sourceTable.config as any,
-        tags: templateData.tags
-      });
-
-      return template;
+      // TODO: customTable n'existe pas dans le schéma Prisma
+      throw new Error('customTable model not available in Prisma schema');
     } catch (error) {
       if (error instanceof ServiceError) throw error;
       throw new ServiceError('Erreur lors de la création du template depuis le tableau', error);
@@ -362,25 +213,6 @@ export class TemplateService {
       const userTemplates = 0;
       const usageStats: any = { _sum: { usageCount: 0 } };
       const topTemplates: any[] = [];
-      /* const [
-        totalTemplates,
-        officialTemplates,
-        userTemplates,
-        usageStats,
-        topTemplates
-      ] = await Promise.all([
-        this.prisma.customTableTemplate.count(),
-        this.prisma.customTableTemplate.count({ where: { isOfficial: true } }),
-        this.prisma.customTableTemplate.count({ where: { isOfficial: false } }),
-        this.prisma.customTableTemplate.aggregate({
-          _sum: { usageCount: true }
-        }),
-        this.prisma.customTableTemplate.findMany({
-          select: { name: true, usageCount: true },
-          orderBy: { usageCount: 'desc' },
-          take: 5
-        })
-      ]); */
 
       return {
         totalTemplates,
