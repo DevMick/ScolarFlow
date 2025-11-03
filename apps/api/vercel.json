@@ -1,9 +1,9 @@
 {
   "version": 2,
-  "buildCommand": "cd ../.. && pnpm install && cd apps/api && pnpm build",
+  "buildCommand": "cd ../.. && npm install -g pnpm@8.12.0 && pnpm install && cd apps/api && pnpm build",
   "outputDirectory": "dist",
-  "devCommand": "cd ../.. && pnpm install && cd apps/api && pnpm dev",
-  "installCommand": "cd ../.. && pnpm install",
+  "devCommand": "cd ../.. && npm install -g pnpm@8.12.0 && pnpm install && cd apps/api && pnpm dev",
+  "installCommand": "cd ../.. && npm install -g pnpm@8.12.0 && pnpm install",
   "framework": null,
   "functions": {
     "api/**/*.ts": {
