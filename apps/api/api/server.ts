@@ -7,7 +7,7 @@
  * Il initialise l'app Express avec toutes les routes et l'exporte pour Vercel
  */
 
-import { app, prisma } from '../src/server';
+import { app, prisma } from '../dist/server';
 import { createApiRoutes } from '../src/routes';
 import { notFoundHandler } from '../src/middleware/errorHandler';
 import { secureErrorHandler } from '../src/middleware/errorHandler.security';
