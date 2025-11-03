@@ -115,7 +115,7 @@ export class StatisticsEngine {
   /**
    * Récupère les données brutes depuis la base de données
    */
-  private async fetchData(dataSources: StatisticConfiguration['dataSources']): Promise<RawEvaluationData[]> {
+  private async fetchData(dataSources: any): Promise<RawEvaluationData[]> {
     const whereConditions: any = {};
 
     // Filtres par classes
@@ -161,34 +161,19 @@ export class StatisticsEngine {
     // TODO: evaluationResult n'existe pas dans le schéma Prisma
     // Utiliser notes ou moyennes à la place
     const results: any[] = [];
-    /* const results = await this.prisma.evaluationResult.findMany({
-      where: whereConditions,
-      include: {
-        evaluation: {
-          include: {
-            class: true
-          }
-        },
-        student: true
-      },
-      orderBy: [
-        { evaluation: { evaluationDate: 'asc' } },
-        { student: { lastName: 'asc' } }
-      ]
-    });
-
+    
     return results.map(result => ({
       id: result.id,
       score: result.score ? Number(result.score) : null,
       isAbsent: result.isAbsent,
-      evaluationDate: result.evaluation.evaluationDate,
-      maxScore: Number(result.evaluation.maxScore),
-      subject: result.evaluation.subject,
-      type: result.evaluation.type,
-      classId: result.evaluation.classId,
-      studentId: result.studentId,
-      studentName: `${result.student.firstName} ${result.student.lastName}`,
-      className: result.evaluation.class.name
+      evaluationDate: result.evaluation?.evaluationDate || new Date(),
+      maxScore: Number(result.evaluation?.maxScore) || 0,
+      subject: result.evaluation?.subject || '',
+      type: result.evaluation?.type || '',
+      classId: result.evaluation?.classId || 0,
+      studentId: result.studentId || 0,
+      studentName: `${result.student?.firstName || ''} ${result.student?.lastName || ''}`,
+      className: result.evaluation?.class?.name || ''
     }));
   }
 
