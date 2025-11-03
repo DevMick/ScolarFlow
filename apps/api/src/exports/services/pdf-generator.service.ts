@@ -16,7 +16,7 @@ export class PdfGeneratorService {
   private async initializeBrowser() {
     try {
       this.browser = await puppeteer.launch({
-        headless: 'new',
+        headless: true,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
