@@ -67,6 +67,21 @@ declare module '@edustats/shared' {
   export type updateStudentSchema = any;
   export type createBulkStudentsSchema = any;
   export type studentFiltersSchema = any;
+  export const registerSchema: any;
+  export const loginSchema: any;
+  export const updateProfileSchema: any;
+  export const createClassSchema: any;
+  export const updateClassSchema: any;
+  export const classQuerySchema: any;
+  export const createSchoolYearSchema: any;
+  export const updateSchoolYearSchema: any;
+  export const createEvaluationResultSchemaWithMax: any;
+  export const createBulkResultsSchemaWithContext: any;
+  export const validateScoreInContext: any;
+  export const createStudentSchema: any;
+  export const updateStudentSchema: any;
+  export const createBulkStudentsSchema: any;
+  export const studentFiltersSchema: any;
   export type ApiResponse<T = any> = {
     success: boolean;
     data?: T;

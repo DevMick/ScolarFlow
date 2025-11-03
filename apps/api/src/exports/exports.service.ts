@@ -42,17 +42,17 @@ export class ExportsService {
     }
 
     // 3. Récupérer les matières
-    const subjects = await this.prisma.subject.findMany({
-      where: { classId: classId },
+    const subjects = await this.prisma.subjects.findMany({
+      where: { class_id: classId },
       orderBy: { name: 'asc' },
     });
 
     // 3.1. Récupérer la configuration de calcul pour cette classe
-    let classConfig = await this.prisma.classAverageConfig.findFirst({
+    let classConfig = await this.prisma.class_average_configs.findFirst({
       where: { 
-        classId: classId,
-        userId: classData.userId,
-        isActive: true
+        class_id: classId,
+        user_id: classData.user_id,
+        is_active: true
       },
     });
 
@@ -61,8 +61,8 @@ export class ExportsService {
       const subjectNames = subjects.map(s => s.name).join(' + ');
       classConfig = {
         id: 0,
-        classId: classId,
-        userId: classData.userId,
+        class_id: classId,
+        user_id: classData.user_id,
         divisor: subjects.length,
         formula: `=(${subjectNames}) ÷ ${subjects.length}`,
         isActive: true,
@@ -73,7 +73,7 @@ export class ExportsService {
 
     // 4. Récupérer les élèves de la classe
     const students = await this.prisma.students.findMany({
-      where: { classId: classId },
+      where: { class_id: classId },
       orderBy: { name: 'asc' },
     });
 
@@ -84,11 +84,11 @@ export class ExportsService {
       const notesMap: Record<number, number> = {};
 
       for (const subject of subjects) {
-        const note = await this.prisma.note.findFirst({
+        const note = await this.prisma.notes.findFirst({
           where: {
-            studentId: student.id,
-            subjectId: subject.id,
-            evaluationId: evaluationId,
+            student_id: student.id,
+            subject_id: subject.id,
+            evaluation_id: evaluationId,
           },
         });
 
@@ -112,8 +112,8 @@ export class ExportsService {
         student: {
           id: student.id,
           name: student.name,
-          firstName: student.firstName,
-          lastName: student.lastName,
+          firstName: (student as any).first_name || '',
+          lastName: (student as any).last_name || '',
           gender: student.gender,
         },
         notes: notesMap,
@@ -158,9 +158,9 @@ export class ExportsService {
         id: classData.id,
         name: classData.name,
         user: {
-          firstName: classData.user.firstName,
-          lastName: classData.user.lastName,
-          establishment: classData.user.establishment,
+          firstName: classData.users.first_name,
+          lastName: classData.users.last_name,
+          establishment: classData.users.establishment,
         },
       },
       subjects,

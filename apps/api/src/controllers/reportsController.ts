@@ -654,11 +654,12 @@ export class ReportsController {
         academicYears: z.array(z.string()).optional()
       });
 
-      const query = schema.parse(req.body);
+      const parsed = schema.parse(req.body);
       // Convertir performanceRange en tuple strict si fourni
-      const searchQuery = query.performanceRange 
-        ? { ...query, performanceRange: [query.performanceRange[0], query.performanceRange[1]] as [number, number] }
-        : query;
+      const searchQuery: any = { ...parsed };
+      if (parsed.performanceRange && Array.isArray(parsed.performanceRange)) {
+        searchQuery.performanceRange = [parsed.performanceRange[0], parsed.performanceRange[1]] as [number, number];
+      }
 
       const archives = await this.archiveService.searchArchives(searchQuery);
 
