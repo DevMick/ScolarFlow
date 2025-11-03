@@ -65,9 +65,9 @@ export class ExportsService {
         user_id: classData.user_id,
         divisor: { value: subjects.length.toString() } as any,
         formula: `=(${subjectNames}) ÷ ${subjects.length}`,
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        is_active: true,
+        created_at: new Date(),
+        updated_at: new Date()
       };
     }
 
@@ -208,13 +208,13 @@ export class ExportsService {
       
       // Vérifier que le résultat est un nombre valide
       if (typeof result !== 'number' || isNaN(result) || !isFinite(result)) {
-        Logger.warn('Résultat de configuration invalide:', result, 'pour la formule:', config.formula);
+        Logger.warn('Résultat de configuration invalide:', { result, formula: config.formula });
         return 0;
       }
       
       return Math.round(result * 100) / 100; // Arrondir à 2 décimales
     } catch (error) {
-      Logger.error('Erreur lors du calcul de la moyenne avec configuration:', error, 'pour la formule:', config.formula);
+      Logger.error('Erreur lors du calcul de la moyenne avec configuration:', { error, formula: config.formula });
       return 0;
     }
   }
