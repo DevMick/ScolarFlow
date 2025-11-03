@@ -78,9 +78,13 @@ export const EXPORT_CONFIG = {
   maxExportsPerHour: 10,
 };
 
+// Base d'upload compatible serverless (Vercel: /tmp)
+const isServerless = !!process.env.VERCEL || !!process.env.LAMBDA_TASK_ROOT;
+const uploadsBase = isServerless ? '/tmp/uploads' : './uploads';
+
 export const FILE_PATHS = {
-  uploads: './uploads',
-  temp: './uploads/temp',
-  exports: './uploads/exports',
-  pdfs: './uploads/pdfs',
+  uploads: `${uploadsBase}`,
+  temp: `${uploadsBase}/temp`,
+  exports: `${uploadsBase}/exports`,
+  pdfs: `${uploadsBase}/pdfs`,
 };
