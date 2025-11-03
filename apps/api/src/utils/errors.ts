@@ -241,7 +241,7 @@ export class ClassOwnershipError extends ForbiddenError {
       'Vous n\'avez pas les droits sur cette classe',
       'ACCESS_CLASS'
     );
-    this.details = { classId, userId };
+    (this as any).details = { classId, userId };
   }
 }
 

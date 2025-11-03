@@ -41,7 +41,7 @@ export const helmetConfig = {
   crossOriginEmbedderPolicy: false,
   
   // Cross-Origin Opener Policy
-  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  crossOriginOpenerPolicy: { policy: 'same-origin' as const },
   
   // Cross-Origin Resource Policy
   crossOriginResourcePolicy: { policy: 'same-origin' },

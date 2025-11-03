@@ -17,7 +17,7 @@ export const idSchema = z.object({
 export const paginationSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10)
-}).optional();
+});
 
 /**
  * Schéma de validation pour les filtres de recherche
@@ -94,5 +94,5 @@ export const idQuerySchema = z.object({
 /**
  * Schéma de validation pour les query params avec pagination et recherche
  */
-export const listQuerySchema = paginationSchema.merge(searchSchema);
+export const listQuerySchema = paginationSchema.and(searchSchema).optional();
 

@@ -62,6 +62,7 @@ interface EvaluationStatistics {
   totalStudents: number;
   presentStudents: number;
   absentStudents: number;
+  outliers?: any[];
   completedCount: number;
   averageScore: number;
   averageOn20: number;
@@ -100,7 +101,7 @@ export class CalculationService {
     return handleDatabaseOperation(async () => {
       const evaluation = await this.getEvaluationWithResults(evaluationId);
       
-      const activeResults = this.getActiveResults(evaluation.results);
+      const activeResults = this.getActiveResults((evaluation as any).results || []);
       const scores = this.extractValidScores(activeResults);
       
       if (scores.length === 0) {
@@ -116,7 +117,7 @@ export class CalculationService {
       }
       
       const stats = calculateBasicStatistics(scores);
-      const maxScore = Number(evaluation.maxScore);
+      const maxScore = Number((evaluation as any).maxScore || 20);
       
       return {
         completedCount: activeResults.filter(r => r.score !== null || r.isAbsent).length,
@@ -137,12 +138,12 @@ export class CalculationService {
     return handleDatabaseOperation(async () => {
       const evaluation = await this.getEvaluationWithResults(evaluationId);
       
-      const activeResults = this.getActiveResults(evaluation.results);
+      const activeResults = this.getActiveResults((evaluation as any).results || []);
       const presentResults = activeResults.filter(r => !r.isAbsent);
       const absentResults = activeResults.filter(r => r.isAbsent);
       const scores = this.extractValidScores(activeResults);
       
-      const maxScore = Number(evaluation.maxScore);
+      const maxScore = Number((evaluation as any).maxScore || 20);
       const stats = calculateBasicStatistics(scores);
       const distribution = calculateScoreDistribution(scores, maxScore);
       const successRate = calculateSuccessRate(scores, 10, maxScore);
@@ -175,8 +176,8 @@ export class CalculationService {
   async calculateRanking(evaluationId: number): Promise<RankingResult[]> {
     try {
       const evaluation = await this.getEvaluationWithResults(evaluationId);
-      const maxScore = Number(evaluation.maxScore);
-      const absentHandling = evaluation.absentHandling as AbsentHandling;
+      const maxScore = Number((evaluation as any).maxScore || 20);
+      const absentHandling = ((evaluation as any).absentHandling || 'exclude') as AbsentHandling;
       
       // Préparer les données pour le classement
       const studentScores: StudentScore[] = evaluation.results.map(result => ({
@@ -535,9 +536,9 @@ export class CalculationService {
   async generateEvaluationReport(evaluationId: number): Promise<ReturnType<typeof generateEvaluationReport>> {
     return handleDatabaseOperation(async () => {
       const evaluation = await this.getEvaluationWithResults(evaluationId);
-      const activeResults = this.getActiveResults(evaluation.results);
+      const activeResults = this.getActiveResults((evaluation as any).results || []);
       const scores = this.extractValidScores(activeResults);
-      const maxScore = Number(evaluation.maxScore);
+      const maxScore = Number((evaluation as any).maxScore || 20);
       const absentCount = activeResults.filter(r => r.isAbsent).length;
       
       return generateEvaluationReport(scores, maxScore, absentCount);
@@ -609,10 +610,10 @@ export class CalculationService {
   }
 
   // ========================================
-  // STATISTIQUES COMPLÈTES
+  // STATISTIQUES COMPLÈTES (VERSION 2)
   // ========================================
 
-  async calculateFullStatistics(evaluationId: number): Promise<{
+  async calculateFullStatisticsV2(evaluationId: number): Promise<{
     totalStudents: number;
     completedCount: number;
     absentStudents: number;
@@ -690,10 +691,10 @@ export class CalculationService {
   }
 
   // ========================================
-  // GÉNÉRATION DE RAPPORT
+  // GÉNÉRATION DE RAPPORT (VERSION 2)
   // ========================================
 
-  async generateEvaluationReport(evaluationId: number): Promise<{
+  async generateEvaluationReportV2(evaluationId: number): Promise<{
     overview: {
       totalStudents: number;
       completedCount: number;

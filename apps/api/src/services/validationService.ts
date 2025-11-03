@@ -532,7 +532,7 @@ export class ValidationService {
         evaluations: true
       },
       orderBy: {
-        evaluation: { evaluationDate: 'desc' }
+        evaluations: { date: 'desc' }
       },
       take: 5
     });

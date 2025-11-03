@@ -12,11 +12,11 @@ export class TokenService {
       };
 
       return jwt.sign(tokenPayload, JWT_CONFIG.secret, {
-        expiresIn: JWT_CONFIG.expiresIn,
+        expiresIn: JWT_CONFIG.expiresIn as string,
         algorithm: JWT_CONFIG.algorithm,
         issuer: JWT_CONFIG.issuer,
         audience: JWT_CONFIG.audience,
-      });
+      } as any);
     } catch (error) {
       Logger.error('Error generating access token', error);
       throw new Error('Erreur lors de la génération du token');
@@ -31,11 +31,11 @@ export class TokenService {
       };
 
       return jwt.sign(tokenPayload, JWT_CONFIG.refreshSecret, {
-        expiresIn: JWT_CONFIG.refreshExpiresIn,
+        expiresIn: JWT_CONFIG.refreshExpiresIn as string,
         algorithm: JWT_CONFIG.algorithm,
         issuer: JWT_CONFIG.issuer,
         audience: JWT_CONFIG.audience,
-      });
+      } as any);
     } catch (error) {
       Logger.error('Error generating refresh token', error);
       throw new Error('Erreur lors de la génération du token de rafraîchissement');

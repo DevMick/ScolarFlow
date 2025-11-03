@@ -185,7 +185,7 @@ export class PerformanceOptimizer {
           },
           select: {
             id: true,
-            title: true,
+            nom: true,
             subject: true,
             max_score: true,
             created_at: true,

@@ -54,7 +54,7 @@ export class AdminService {
       }
 
       // Vérifier si l'admin est actif
-      if (!admin.isActive) {
+      if (!admin.is_active) {
         return {
           success: false,
           message: 'Compte administrateur désactivé'
@@ -89,8 +89,8 @@ export class AdminService {
         admin: {
           id: admin.id,
           username: admin.username,
-          isActive: admin.isActive,
-          createdAt: admin.createdAt
+          isActive: admin.is_active,
+          createdAt: admin.created_at
         },
         token
       };
@@ -124,7 +124,7 @@ export class AdminService {
         where: { id: decoded.adminId }
       });
 
-      if (!admin || !admin.isActive) {
+      if (!admin || !admin.is_active) {
         return {
           success: false,
           message: 'Administrateur non trouvé ou inactif'
@@ -136,8 +136,8 @@ export class AdminService {
         admin: {
           id: admin.id,
           username: admin.username,
-          isActive: admin.isActive,
-          createdAt: admin.createdAt
+          isActive: admin.is_active,
+          createdAt: admin.created_at
         },
         message: 'Token valide'
       };
@@ -186,8 +186,8 @@ export class AdminService {
         admin: {
           id: admin.id,
           username: admin.username,
-          isActive: admin.isActive,
-          createdAt: admin.createdAt
+          isActive: admin.is_active,
+          createdAt: admin.created_at
         }
       };
 

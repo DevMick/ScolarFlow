@@ -13,6 +13,12 @@ declare global {
         email: string;
         firstName: string;
         lastName: string;
+        role?: string;
+      };
+      admin?: {
+        id: number;
+        username: string;
+        email?: string;
       };
       validatedData?: any;
       requestId?: string;
@@ -29,6 +35,12 @@ export interface AuthenticatedRequest extends Request {
     email: string;
     firstName: string;
     lastName: string;
+    role?: string;
+  };
+  admin?: {
+    id: number;
+    username: string;
+    email?: string;
   };
 }
 
@@ -38,6 +50,12 @@ export type AuthRequest = Request & {
     email: string;
     firstName: string;
     lastName: string;
+    role?: string;
+  };
+  admin?: {
+    id: number;
+    username: string;
+    email?: string;
   };
 };
 

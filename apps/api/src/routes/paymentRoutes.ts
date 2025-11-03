@@ -57,7 +57,7 @@ router.post(
   '/:id/screenshot', 
   authenticateToken, 
   validateParams(idSchema),
-  upload,
+  upload as any,
   validateUploadedFile,
   cleanupUploadOnError,
   async (req: Request, res: Response) => {

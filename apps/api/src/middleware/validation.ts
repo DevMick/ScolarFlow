@@ -111,7 +111,7 @@ export function validate(schema: ZodSchema, location: 'body' | 'query' | 'params
         res.status(400).json({
           success: false,
           message: 'Données invalides',
-          errors: validationErrors,
+          errors: validationErrors.map(err => err.message || err.field),
           requestId: req.requestId,
           timestamp: new Date().toISOString()
         });

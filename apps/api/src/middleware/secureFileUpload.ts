@@ -109,7 +109,7 @@ export function createSecureUploader(
     destination?: string;
     fieldName?: string;
   } = {}
-): Multer {
+): any {
   const {
     category = 'image',
     maxSize = MAX_FILE_SIZE,
@@ -122,7 +122,7 @@ export function createSecureUploader(
   
   const storage = createSecureStorage(destination, category);
   
-  return multer({
+  const multerInstance = multer({
     storage,
     limits: {
       fileSize: maxSize,
