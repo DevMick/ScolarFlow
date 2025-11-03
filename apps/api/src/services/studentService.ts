@@ -120,8 +120,7 @@ export class StudentService {
         gender: student.gender,
         studentNumber: student.student_number,
         isActive: student.is_active,
-        createdAt: student.created_at,
-        updatedAt: student.updated_at,
+        // createdAt and updatedAt removed from StudentWithClass interface
         class: student.classes ? {
           id: student.classes.id,
           name: student.classes.name,
@@ -177,8 +176,7 @@ export class StudentService {
         gender: student.gender,
         studentNumber: student.student_number,
         isActive: student.is_active,
-        createdAt: student.created_at,
-        updatedAt: student.updated_at,
+        // createdAt and updatedAt removed from StudentWithClass interface
         class: student.classes ? {
           id: student.classes.id,
           name: student.classes.name,
@@ -259,8 +257,7 @@ export class StudentService {
         gender: student.gender,
         studentNumber: student.student_number,
         isActive: student.is_active,
-        createdAt: student.created_at,
-        updatedAt: student.updated_at,
+        // createdAt and updatedAt removed from StudentWithClass interface
         class: student.classes ? {
           id: student.classes.id,
           name: student.classes.name,
@@ -366,8 +363,7 @@ export class StudentService {
         gender: student.gender,
         studentNumber: student.student_number,
         isActive: student.is_active,
-        createdAt: student.created_at,
-        updatedAt: student.updated_at,
+        // createdAt and updatedAt removed from StudentWithClass interface
         class: student.classes ? {
           id: student.classes.id,
           name: student.classes.name,
