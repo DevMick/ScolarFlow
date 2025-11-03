@@ -8,11 +8,11 @@
  */
 
 import { app, prisma } from '../dist/server';
-import { createApiRoutes } from '../src/routes';
-import { notFoundHandler } from '../src/middleware/errorHandler';
-import { secureErrorHandler } from '../src/middleware/errorHandler.security';
-import { ensureDirectories } from '../src/utils/fileUpload';
-import { Logger } from '../src/utils/logger';
+import { createApiRoutes } from '../dist/routes';
+import { notFoundHandler } from '../dist/middleware/errorHandler';
+import { secureErrorHandler } from '../dist/middleware/errorHandler.security';
+import { ensureDirectories } from '../dist/utils/fileUpload';
+import { Logger } from '../dist/utils/logger';
 
 // Initialiser les routes pour Vercel (une seule fois)
 let routesInitialized = false;
