@@ -548,6 +548,7 @@ export class PaymentService {
       });
       return {
         success: false,
+        payments: [],
         message: `Erreur lors de la récupération des paiements: ${errorMessage}`
       };
     }

@@ -1439,8 +1439,8 @@ async exportStudents(
       include: {
           users: {
           select: {
-            firstName: true,
-            lastName: true,
+            first_name: true,
+            last_name: true,
             email: true
           }
         }
