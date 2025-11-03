@@ -713,7 +713,7 @@ export class ResultService {
     const evaluation = await this.prisma.evaluations.findFirst({
       where: {
         id: evaluationId,
-        class: { userId }
+        classes: { user_id: userId }
       },
       include: {
         classes: {
