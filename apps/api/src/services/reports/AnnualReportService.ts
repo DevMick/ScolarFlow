@@ -454,8 +454,7 @@ export class AnnualReportService {
   private async loadTemplate(templateId: string): Promise<ReportTemplate> {
     // @ts-ignore - reportTemplate model not in Prisma schema yet
     const template: any = null;
-      where: { id: parseInt(templateId) }
-    });
+    // TODO: Implémenter avec le modèle reportTemplate quand il sera disponible
     
     if (!template) {
       throw new Error('Template de rapport introuvable');
