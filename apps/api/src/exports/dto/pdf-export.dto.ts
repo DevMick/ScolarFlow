@@ -47,6 +47,7 @@ export interface EvaluationPDFData {
 }
 
 export interface PDFExportResult {
+  success?: boolean;
   filename: string;
   filepath: string;
   fileSize: number;
