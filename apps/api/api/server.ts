@@ -53,9 +53,21 @@ const initPromise = initializeRoutes().catch((error) => {
 // Export pour Vercel (format serverless function)
 // Vercel attend un handler qui gère (req, res)
 export default async function handler(req: any, res: any) {
-  // Attendre que les routes soient initialisées
-  await initPromise;
-  
-  // Passer la requête à l'app Express
-  app(req, res);
+  try {
+    // Attendre que les routes soient initialisées
+    await initPromise;
+    
+    // Passer la requête à l'app Express
+    // Express peut être utilisé directement comme handler HTTP
+    return app(req, res);
+  } catch (error) {
+    Logger.error('Error in Vercel handler', error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? String(error) : undefined
+      });
+    }
+  }
 }

@@ -45,13 +45,13 @@ const app: Express = express();
 const DEFAULT_PORT = 3001;
 const PORT = process.env.PORT || DEFAULT_PORT;
 
-// Export de l'app pour Vercel Serverless Functions
-export default app;
-
 // Initialize Prisma Client
 export const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
 });
+
+// Export de l'app pour Vercel Serverless Functions
+export { app };
 
 // ========================================
 // CONFIGURATION DE SÉCURITÉ DE BASE
