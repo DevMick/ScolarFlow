@@ -170,7 +170,7 @@ export class ExportService {
           student: {
             ...student,
             gender: student.gender as 'M' | 'F' | undefined,
-            studentNumber: student.studentNumber || undefined
+            student_number: student.studentNumber || undefined
           },
           notes: notesMap,
           total,
@@ -335,7 +335,7 @@ export class ExportService {
           student: {
             ...student,
             gender: student.gender as 'M' | 'F' | undefined,
-            studentNumber: student.studentNumber || undefined
+            student_number: student.studentNumber || undefined
           },
           notes: notesMap,
           total,
@@ -1430,7 +1430,7 @@ async exportStudents(
     return await this.prisma.classes.findUniqueOrThrow({
       where: { id: classId },
       include: {
-        user: {
+          users: {
           select: {
             firstName: true,
             lastName: true,

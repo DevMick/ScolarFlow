@@ -462,6 +462,7 @@ export class ResultService {
             evaluationId,
             resultData.studentId,
             {
+              studentId: resultData.studentId,
               score: resultData.score,
               isAbsent: resultData.isAbsent,
               absentReason: resultData.absentReason,
