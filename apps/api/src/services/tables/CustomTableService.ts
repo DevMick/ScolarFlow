@@ -522,7 +522,7 @@ export class CustomTableService {
         is_active: true
       },
       include: {
-        class: { select: { name: true, level: true } }
+        classes: { select: { name: true, level: true } }
       },
       orderBy: [
         { name: 'asc' }

@@ -157,8 +157,8 @@ export class ExportService {
         // @ts-ignore - moyenne model not in Prisma schema yet
         const moyenneRecord = await this.prisma.moyennes.findFirst({
           where: {
-            studentId: student.id,
-            evaluationId: evaluationId
+            student_id: student.id,
+            evaluation_id: evaluationId
           }
         });
 
@@ -174,7 +174,7 @@ export class ExportService {
           student: {
             ...student,
             gender: student.gender as 'M' | 'F' | undefined,
-            student_number: student.studentNumber || undefined
+            student_number: student.student_number || undefined
           },
           notes: notesMap,
           total,
@@ -326,8 +326,8 @@ export class ExportService {
         // @ts-ignore - moyenne model not in Prisma schema yet
         const moyenneRecord = await this.prisma.moyennes.findFirst({
           where: {
-            studentId: student.id,
-            evaluationId: evaluationId
+            student_id: student.id,
+            evaluation_id: evaluationId
           }
         });
         
@@ -342,7 +342,7 @@ export class ExportService {
           student: {
             ...student,
             gender: student.gender as 'M' | 'F' | undefined,
-            student_number: student.studentNumber || undefined
+            student_number: student.student_number || undefined
           },
           notes: notesMap,
           total,
@@ -1457,8 +1457,8 @@ async exportStudents(
   ): Promise<Student[]> {
     const students = await this.prisma.students.findMany({
       where: {
-        classId,
-        ...(options.includeInactive ? {} : { isActive: true })
+        class_id: classId,
+        ...(options.includeInactive ? {} : { is_active: true })
       },
       orderBy: {
         name: 'asc'
@@ -1505,8 +1505,8 @@ async exportStudents(
     const classExists = await this.prisma.classes.findFirst({
       where: {
         id: classId,
-        userId,
-        isActive: true
+        user_id: userId,
+        is_active: true
       }
     });
 
