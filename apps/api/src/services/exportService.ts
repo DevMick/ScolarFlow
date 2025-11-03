@@ -77,7 +77,7 @@ export class ExportService {
       // Récupérer les données de la classe
       const classData = await this.prisma.classes.findFirst({
         where: { id: classId },
-        include: { user: true }
+        include: { users: true }
       });
 
       if (!classData) {
@@ -97,13 +97,13 @@ export class ExportService {
       // @ts-ignore - schoolYear model not in Prisma schema yet
       const activeSchoolYear = await this.prisma.school_years.findFirst({
         where: { 
-          userId: userId,
-          isActive: true 
+          user_id: userId,
+          is_active: true 
         }
       });
 
       const academicYear = activeSchoolYear 
-        ? `${activeSchoolYear.startYear}-${activeSchoolYear.endYear}`
+        ? `${activeSchoolYear.start_year}-${activeSchoolYear.end_year}`
         : new Date().getFullYear() + '-' + (new Date().getFullYear() + 1);
 
       // Récupérer les matières
@@ -130,15 +130,15 @@ export class ExportService {
           // @ts-ignore - note model not in Prisma schema yet
           const note = await this.prisma.notes.findFirst({
             where: {
-              studentId: student.id,
-              subjectId: subject.id,
-              evaluationId: evaluationId
+              student_id: student.id,
+              subject_id: subject.id,
+              evaluation_id: evaluationId
             }
           });
           
           if (note) {
             // Vérifier si l'élève est absent
-            if (note.isAbsent) {
+            if (note.is_absent) {
               isStudentAbsent = true;
             }
             
@@ -261,7 +261,7 @@ export class ExportService {
       // Récupérer les données de la classe
       const classData = await this.prisma.classes.findFirst({
         where: { id: classId },
-        include: { user: true }
+        include: { users: true }
       });
 
       if (!classData) {
@@ -299,15 +299,15 @@ export class ExportService {
           // @ts-ignore - note model not in Prisma schema yet
           const note = await this.prisma.notes.findFirst({
             where: {
-              studentId: student.id,
-              subjectId: subject.id,
-              evaluationId: evaluationId
+              student_id: student.id,
+              subject_id: subject.id,
+              evaluation_id: evaluationId
             }
           });
           
           if (note) {
             // Vérifier si l'élève est absent
-            if (note.isAbsent) {
+            if (note.is_absent) {
               isStudentAbsent = true;
             }
             

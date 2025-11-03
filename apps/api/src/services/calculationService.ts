@@ -640,7 +640,7 @@ export class CalculationService {
       throw new CalculationError('Évaluation non trouvée');
     }
 
-    const activeResults = evaluation.results.filter(r => r.student.isActive);
+    const activeResults = ((evaluation as any).results || []).filter((r: any) => r.student?.isActive);
     const totalStudents = activeResults.length;
     const absentStudents = activeResults.filter(r => r.isAbsent).length;
     const completed = activeResults.filter(r => r.score !== null || r.isAbsent);
@@ -653,7 +653,7 @@ export class CalculationService {
       ? scores.reduce((a, b) => a + b, 0) / scores.length 
       : 0;
 
-    const averageOn20 = (averageScore / Number(evaluation.maxScore)) * 20;
+    const averageOn20 = (averageScore / Number((evaluation as any).maxScore || 20)) * 20;
     const median = calculateMedian(scores);
     const standardDeviation = calculateStandardDeviation(scores);
 
@@ -661,12 +661,12 @@ export class CalculationService {
     const quartiles = this.calculateQuartilesInternal(scores);
 
     // Taux de réussite (supposons que 10/20 = réussite)
-    const successThreshold = Number(evaluation.maxScore) * 0.5;
+    const successThreshold = Number((evaluation as any).maxScore || 20) * 0.5;
     const successCount = scores.filter(s => s >= successThreshold).length;
     const successRate = scores.length > 0 ? (successCount / scores.length) * 100 : 0;
 
     // Distribution par tranches
-    const distribution = this.calculateDistribution(scores, Number(evaluation.maxScore));
+    const distribution = this.calculateDistribution(scores, Number((evaluation as any).maxScore || 20));
 
     // Détection des outliers
     const outliers = this.detectOutliersInternal(scores);

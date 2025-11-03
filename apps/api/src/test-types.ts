@@ -55,7 +55,7 @@ const testPaginatedResponse: PaginatedResponse<Evaluation> = {
     limit: 20,
     totalPages: 3,
     // hasNext removed from pagination type
-    hasPrev: false,
+    // hasPrev removed from pagination type
     startIndex: 0,
     endIndex: 19
   }
