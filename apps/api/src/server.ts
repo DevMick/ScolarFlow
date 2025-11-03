@@ -274,8 +274,42 @@ async function startServer() {
   }
 }
 
+// Initialiser les routes pour Vercel (même si on n'écoute pas sur un port)
+// Cela permet à l'app Express d'être utilisable directement dans Vercel
+async function initializeForVercel() {
+  if (process.env.VERCEL === '1' || process.env.LAMBDA_TASK_ROOT) {
+    try {
+      // Test database connection
+      await prisma.$connect();
+      Logger.info('Connected to PostgreSQL database (Vercel)');
+
+      // Initialize file directories
+      ensureDirectories();
+      Logger.info('File directories initialized (Vercel)');
+
+      // Initialize API routes
+      Logger.info('Initializing API routes for Vercel...');
+      const apiRoutes = await createApiRoutes(prisma);
+      app.use('/api', apiRoutes);
+      Logger.info('API routes initialized successfully for Vercel');
+
+      // Error handling middleware (must be last)
+      app.use(notFoundHandler);
+      app.use(secureErrorHandler);
+    } catch (error) {
+      Logger.error('Failed to initialize for Vercel', error);
+      throw error;
+    }
+  }
+}
+
+// Initialiser pour Vercel si nécessaire
+initializeForVercel().catch((error) => {
+  Logger.error('Critical error during Vercel initialization', error);
+});
+
 // Démarrer le serveur seulement si on n'est pas dans un environnement serverless (Vercel)
 // Vercel définit automatiquement VERCEL=1
 if (process.env.VERCEL !== '1' && !process.env.LAMBDA_TASK_ROOT) {
-startServer();
+  startServer();
 }
