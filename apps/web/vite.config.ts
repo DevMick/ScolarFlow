@@ -31,24 +31,36 @@ export default defineConfig({
         manualChunks: undefined,
         // Assurer la compatibilité avec les modules CommonJS/ESM
         format: 'es',
-        interop: 'auto',
-        // Générer les helpers d'interopération de manière plus compatible
+        // Utiliser 'default' pour forcer l'injection inline des helpers
+        interop: 'default',
+        // Générer le code de manière compatible avec injection inline des helpers
         generatedCode: {
           constBindings: true,
-          objectShorthand: true
+          objectShorthand: true,
+          // Préserver les helpers inline pour éviter les problèmes de références
+          preserveAll: false
         },
         // Préserver les helpers d'interopération
         exports: 'named',
         // Préserver les noms de fonctions pour éviter les problèmes
-        preserveModules: false
+        preserveModules: false,
+        // Forcer l'injection inline des helpers d'interopération
+        inlineDynamicImports: false
       },
       external: [],
       // Forcer la transformation de tous les modules CommonJS
-      plugins: []
+      plugins: [],
+      // Gérer les avertissements pour éviter les problèmes
+      onwarn(warning, warn) {
+        // Ignorer certains avertissements qui ne sont pas critiques
+        if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return
+        warn(warning)
+      }
     },
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true,
+      // Utiliser 'auto' pour une meilleure détection automatique
       defaultIsModuleExports: 'auto',
       requireReturnsDefault: 'auto',
       // Ne pas utiliser esmExternals en production pour éviter les problèmes
