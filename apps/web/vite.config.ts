@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -32,7 +31,7 @@ export default defineConfig({
         manualChunks: undefined,
         // Assurer la compatibilité avec les modules CommonJS/ESM
         format: 'es',
-        interop: 'esModule',
+        interop: 'auto',
         // Générer les helpers d'interopération de manière plus compatible
         generatedCode: {
           constBindings: true,
@@ -50,8 +49,8 @@ export default defineConfig({
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true,
-      defaultIsModuleExports: 'default',
-      requireReturnsDefault: 'default',
+      defaultIsModuleExports: 'auto',
+      requireReturnsDefault: 'auto',
       // Ne pas utiliser esmExternals en production pour éviter les problèmes
       esmExternals: false,
       // Gérer spécifiquement dayjs et ses plugins
@@ -63,12 +62,14 @@ export default defineConfig({
     },
     // Optimisations pour la production
     minify: 'esbuild',
-    target: 'esnext',
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     sourcemap: false,
     // Forcer la transformation de tous les modules
     modulePreload: false,
     // Forcer le chunking pour éviter les problèmes
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000,
+    // Assurer la compatibilité avec les navigateurs modernes
+    cssCodeSplit: true
   },
   optimizeDeps: {
     include: [
