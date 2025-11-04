@@ -165,7 +165,7 @@ export const PaymentPage: React.FC = () => {
                   Montant à payer :
                 </h3>
                 <div className="text-3xl font-bold text-green-600">
-                  3 000 FCFA
+                  5 000 FCFA
                 </div>
                 <p className="text-sm text-green-700 mt-1">
                   Paiement unique pour 1 an
@@ -180,7 +180,7 @@ export const PaymentPage: React.FC = () => {
                 <ol className="text-sm text-yellow-800 space-y-1">
                   <li>1. Ouvrez votre application Wave</li>
                   <li>2. Effectuez un transfert vers le numéro : <strong>05 95 03 18 43</strong></li>
-                  <li>3. Montant : <strong>3 000 FCFA</strong></li>
+                  <li>3. Montant : <strong>5 000 FCFA</strong></li>
                   <li>4. Prenez une capture d'écran de la transaction</li>
                   <li>5. Uploadez la capture ci-dessous</li>
                 </ol>

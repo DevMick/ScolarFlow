@@ -1,0 +1,79 @@
+warning: in the working copy of 'apps/web/vite.config.ts', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/apps/web/vite.config.ts b/apps/web/vite.config.ts[m
+[1mindex 911d353..e5b10eb 100644[m
+[1m--- a/apps/web/vite.config.ts[m
+[1m+++ b/apps/web/vite.config.ts[m
+[36m@@ -1,6 +1,7 @@[m
+ import { defineConfig } from 'vite'[m
+ import react from '@vitejs/plugin-react'[m
+ import path from 'path'[m
+[32m+[m[32mimport { resolve } from 'path'[m
+ [m
+ // https://vite.dev/config/[m
+ export default defineConfig({[m
+[36m@@ -18,28 +19,56 @@[m [mexport default defineConfig({[m
+     },[m
+     preserveSymlinks: true,[m
+     dedupe: ['react', 'react-dom'],[m
+[31m-    mainFields: ['module', 'jsnext:main', 'jsnext', 'browser', 'main'],[m
+[32m+[m[32m    // Prioriser les modules ESM pour éviter les problèmes de compatibilité[m
+[32m+[m[32m    mainFields: ['module', 'browser', 'main'],[m
+     conditions: ['import', 'module', 'browser', 'default'][m
+   },[m
+   define: {[m
+[31m-    'process.env': process.env[m
+[32m+[m[32m    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')[m
+   },[m
+   build: {[m
+     rollupOptions: {[m
+       output: {[m
+[31m-        manualChunks: undefined[m
+[32m+[m[32m        manualChunks: undefined,[m
+[32m+[m[32m        // Assurer la compatibilité avec les modules CommonJS/ESM[m
+[32m+[m[32m        format: 'es',[m
+[32m+[m[32m        interop: 'esModule',[m
+[32m+[m[32m        // Générer les helpers d'interopération de manière plus compatible[m
+[32m+[m[32m        generatedCode: {[m
+[32m+[m[32m          constBindings: true,[m
+[32m+[m[32m          objectShorthand: true[m
+[32m+[m[32m        },[m
+[32m+[m[32m        // Préserver les helpers d'interopération[m
+[32m+[m[32m        exports: 'named',[m
+[32m+[m[32m        // Préserver les noms de fonctions pour éviter les problèmes[m
+[32m+[m[32m        preserveModules: false[m
+       },[m
+[31m-      external: [][m
+[32m+[m[32m      external: [],[m
+[32m+[m[32m      // Forcer la transformation de tous les modules CommonJS[m
+[32m+[m[32m      plugins: [][m
+     },[m
+     commonjsOptions: {[m
+       include: [/node_modules/],[m
+       transformMixedEsModules: true,[m
+[31m-      defaultIsModuleExports: true,[m
+[31m-      requireReturnsDefault: 'auto',[m
+[31m-      esmExternals: true,[m
+[32m+[m[32m      defaultIsModuleExports: 'default',[m
+[32m+[m[32m      requireReturnsDefault: 'default',[m
+[32m+[m[32m      // Ne pas utiliser esmExternals en production pour éviter les problèmes[m
+[32m+[m[32m      esmExternals: false,[m
+       // Gérer spécifiquement dayjs et ses plugins[m
+[31m-      transformRequire: false[m
+[31m-    }[m
+[32m+[m[32m      transformRequire: true,[m
+[32m+[m[32m      // Forcer la transformation des modules problématiques[m
+[32m+[m[32m      strictRequires: false,[m
+[32m+[m[32m      // Forcer la transformation de tous les requires[m
+[32m+[m[32m      dynamicRequireTargets: [][m
+[32m+[m[32m    },[m
+[32m+[m[32m    // Optimisations pour la production[m
+[32m+[m[32m    minify: 'esbuild',[m
+[32m+[m[32m    target: 'esnext',[m
+[32m+[m[32m    sourcemap: false,[m
+[32m+[m[32m    // Forcer la transformation de tous les modules[m
+[32m+[m[32m    modulePreload: false,[m
+[32m+[m[32m    // Forcer le chunking pour éviter les problèmes[m
+[32m+[m[32m    chunkSizeWarningLimit: 1000[m
+   },[m
+   optimizeDeps: {[m
+     include: [[m

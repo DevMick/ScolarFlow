@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -18,28 +19,56 @@ export default defineConfig({
     },
     preserveSymlinks: true,
     dedupe: ['react', 'react-dom'],
-    mainFields: ['module', 'jsnext:main', 'jsnext', 'browser', 'main'],
+    // Prioriser les modules ESM pour éviter les problèmes de compatibilité
+    mainFields: ['module', 'browser', 'main'],
     conditions: ['import', 'module', 'browser', 'default']
   },
   define: {
-    'process.env': process.env
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production')
   },
   build: {
     rollupOptions: {
       output: {
-        manualChunks: undefined
+        manualChunks: undefined,
+        // Assurer la compatibilité avec les modules CommonJS/ESM
+        format: 'es',
+        interop: 'esModule',
+        // Générer les helpers d'interopération de manière plus compatible
+        generatedCode: {
+          constBindings: true,
+          objectShorthand: true
+        },
+        // Préserver les helpers d'interopération
+        exports: 'named',
+        // Préserver les noms de fonctions pour éviter les problèmes
+        preserveModules: false
       },
-      external: []
+      external: [],
+      // Forcer la transformation de tous les modules CommonJS
+      plugins: []
     },
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true,
-      defaultIsModuleExports: true,
-      requireReturnsDefault: 'auto',
-      esmExternals: true,
+      defaultIsModuleExports: 'default',
+      requireReturnsDefault: 'default',
+      // Ne pas utiliser esmExternals en production pour éviter les problèmes
+      esmExternals: false,
       // Gérer spécifiquement dayjs et ses plugins
-      transformRequire: false
-    }
+      transformRequire: true,
+      // Forcer la transformation des modules problématiques
+      strictRequires: false,
+      // Forcer la transformation de tous les requires
+      dynamicRequireTargets: []
+    },
+    // Optimisations pour la production
+    minify: 'esbuild',
+    target: 'esnext',
+    sourcemap: false,
+    // Forcer la transformation de tous les modules
+    modulePreload: false,
+    // Forcer le chunking pour éviter les problèmes
+    chunkSizeWarningLimit: 1000
   },
   optimizeDeps: {
     include: [

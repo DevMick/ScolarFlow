@@ -46,7 +46,7 @@ export function TarifPage() {
     {
       id: 'single',
       name: 'Formule 1 Classe',
-      price: '3 000',
+      price: '5 000',
       currency: 'FCFA',
       period: 'par an',
       description: 'Recommandée si : Vous êtes satisfait de la plateforme et souhaitez continuer',
@@ -290,7 +290,7 @@ export function TarifPage() {
               <Text className="text-gray-600">
                 <strong>Commencez par la Formule Démarrage</strong> pour explorer toutes les fonctionnalités gratuitement. 
                 Si vous êtes satisfait après 14 jours, nous vous recommandons la <strong>Formule 1 Classe</strong> 
-                qui offre la solution complète pour votre gestion scolaire au tarif économique de 3 000 FCFA par an.
+                qui offre la solution complète pour votre gestion scolaire au tarif économique de 5 000 FCFA par an.
               </Text>
             </Card>
             
