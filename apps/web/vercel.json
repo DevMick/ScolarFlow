@@ -1,9 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd ../.. && npx --yes pnpm@8.12.0 install && cd packages/shared && npx --yes pnpm@8.12.0 build && cd ../../apps/web && npx --yes pnpm@8.12.0 build",
-  "outputDirectory": "dist",
-  "devCommand": "cd ../.. && npx --yes pnpm@8.12.0 install && cd apps/web && npx --yes pnpm@8.12.0 dev",
-  "installCommand": "cd ../.. && npx --yes pnpm@8.12.0 install",
+  "buildCommand": "pnpm install --frozen-lockfile && pnpm --filter @edustats/shared build && pnpm --filter @scolarflow/web build",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "pnpm install --frozen-lockfile",
   "framework": "vite",
   "rewrites": [
     {

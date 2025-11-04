@@ -139,14 +139,18 @@ export default defineConfig({
       'dayjs/plugin/utc',
       'dayjs/plugin/timezone',
       // Forcer l'optimisation de @ant-design/cssinjs pour éviter les problèmes de token undefined
-      '@ant-design/cssinjs'
+      '@ant-design/cssinjs',
+      // Package interne - doit être optimisé
+      '@edustats/shared'
     ],
     exclude: ['antd'], // Retirer @ant-design/cssinjs de l'exclusion pour permettre la pré-optimisation
     esbuildOptions: {
       resolveExtensions: ['.tsx', '.ts', '.jsx', '.js', '.mjs'],
       plugins: [],
       // Gérer les exports CommonJS pour dayjs
-      mainFields: ['module', 'main']
+      mainFields: ['module', 'main'],
+      // Forcer la transformation du package shared
+      target: 'es2020'
     }
   }
 })

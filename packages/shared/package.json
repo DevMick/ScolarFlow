@@ -2,8 +2,10 @@
   "name": "@edustats/shared",
   "version": "1.0.0",
   "description": "Types et utilitaires partagés pour EduStats",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -16,17 +18,26 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./types": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/types/index.js",
-      "require": "./dist/types/index.js"
+      "require": "./dist/types/index.js",
+      "default": "./dist/types/index.js"
     },
     "./validation": {
       "types": "./dist/validation/index.d.ts",
-      "import": "./dist/validation/index.js", 
-      "require": "./dist/validation/index.js"
+      "import": "./dist/validation/index.js",
+      "require": "./dist/validation/index.js",
+      "default": "./dist/validation/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.js",
+      "default": "./dist/utils/index.js"
     }
   },
   "devDependencies": {
