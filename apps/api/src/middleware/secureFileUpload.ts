@@ -122,8 +122,11 @@ export function createSecureUploader(
   
   const storage = createSecureStorage(destination, category);
   
+  // Utiliser memoryStorage pour permettre l'accès au buffer
+  const multerStorage = multer.memoryStorage();
+  
   const multerInstance = multer({
-    storage,
+    storage: multerStorage,
     limits: {
       fileSize: maxSize,
       files: 1 // Un seul fichier à la fois
@@ -177,6 +180,8 @@ export function createSecureUploader(
       cb(null, true);
     }
   }).single(fieldName);
+  
+  return multerInstance;
 }
 
 /**

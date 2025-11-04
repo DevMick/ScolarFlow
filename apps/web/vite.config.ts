@@ -9,7 +9,7 @@ export default defineConfig({
     port: 3000,
     host: true,
     open: true,
-    strictPort: true
+    strictPort: false // Permettre à Vite d'utiliser un autre port si 3000 est occupé
   },
   resolve: {
     alias: {
@@ -36,7 +36,9 @@ export default defineConfig({
       transformMixedEsModules: true,
       defaultIsModuleExports: true,
       requireReturnsDefault: 'auto',
-      esmExternals: true
+      esmExternals: true,
+      // Gérer spécifiquement dayjs et ses plugins
+      transformRequire: false
     }
   },
   optimizeDeps: {
@@ -44,8 +46,6 @@ export default defineConfig({
       'react-hot-toast',
       'goober',
       'classnames',
-      'antd',
-      '@ant-design/cssinjs',
       '@ant-design/cssinjs-utils',
       '@emotion/hash',
       '@emotion/unitless',
@@ -55,7 +55,6 @@ export default defineConfig({
       '@ant-design/icons-svg',
       '@ant-design/colors',
       '@ant-design/fast-color',
-      '@babel/runtime',
       'rc-util',
       'rc-motion',
       'rc-resize-observer',
@@ -76,10 +75,32 @@ export default defineConfig({
       '@tanstack/react-virtual',
       '@tanstack/virtual-core',
       '@rc-component/async-validator',
-      '@rc-component/motion'
+      '@rc-component/motion',
+      // Ant Design locale files (CommonJS modules need to be pre-bundled)
+      'antd/locale/fr_FR',
+      // dayjs core + plugins référencés par antd/rc-picker
+      'dayjs',
+      'dayjs/plugin/advancedFormat',
+      'dayjs/plugin/customParseFormat',
+      'dayjs/plugin/weekday',
+      'dayjs/plugin/weekOfYear',
+      'dayjs/plugin/weekYear',
+      'dayjs/plugin/isSameOrBefore',
+      'dayjs/plugin/isSameOrAfter',
+      'dayjs/plugin/localeData',
+      'dayjs/plugin/updateLocale',
+      'dayjs/plugin/quarterOfYear',
+      'dayjs/plugin/utc',
+      'dayjs/plugin/timezone',
+      // Forcer l'optimisation de @ant-design/cssinjs pour éviter les problèmes de token undefined
+      '@ant-design/cssinjs'
     ],
+    exclude: ['antd'], // Retirer @ant-design/cssinjs de l'exclusion pour permettre la pré-optimisation
     esbuildOptions: {
-      resolveExtensions: ['.tsx', '.ts', '.jsx', '.js', '.mjs']
+      resolveExtensions: ['.tsx', '.ts', '.jsx', '.js', '.mjs'],
+      plugins: [],
+      // Gérer les exports CommonJS pour dayjs
+      mainFields: ['module', 'main']
     }
   }
 })

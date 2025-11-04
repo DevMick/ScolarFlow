@@ -66,7 +66,7 @@ export function AdminPaymentsPage() {
 
   const updatePaymentStatus = async (paymentId: number, status: 'validated' | 'rejected') => {
     try {
-      await PaymentService.updatePaymentStatus(paymentId, status);
+      await PaymentService.updateAdminPaymentStatus(paymentId, status);
       
       // Recharger les paiements après mise à jour
       await loadPayments();

@@ -112,6 +112,31 @@ export function detectAttackPatterns(input: string): string[] {
 }
 
 /**
+ * Extrait récursivement toutes les valeurs string d'un objet
+ */
+function extractStringValues(obj: any): string[] {
+  const values: string[] = [];
+  
+  if (obj === null || obj === undefined) {
+    return values;
+  }
+  
+  if (typeof obj === 'string') {
+    values.push(obj);
+  } else if (Array.isArray(obj)) {
+    obj.forEach(item => {
+      values.push(...extractStringValues(item));
+    });
+  } else if (typeof obj === 'object') {
+    Object.values(obj).forEach(value => {
+      values.push(...extractStringValues(value));
+    });
+  }
+  
+  return values;
+}
+
+/**
  * Middleware pour détecter les tentatives d'injection dans les requêtes
  */
 export const detectInjectionAttempts = (
@@ -119,27 +144,40 @@ export const detectInjectionAttempts = (
   res: Response,
   next: any
 ): void => {
+  // Exclure certaines routes sensibles de la détection stricte (comme login/register)
+  // Ces routes ont déjà leur propre validation
+  const excludedPaths = ['/api/auth/login', '/api/auth/register'];
+  if (excludedPaths.some(path => req.path.startsWith(path))) {
+    return next();
+  }
+  
   const suspiciousPatterns: string[] = [];
   
-  // Vérifier le body
+  // Vérifier le body - extraire uniquement les valeurs string, pas la structure JSON
   if (req.body) {
-    const bodyStr = JSON.stringify(req.body);
-    const bodyPatterns = detectAttackPatterns(bodyStr);
-    suspiciousPatterns.push(...bodyPatterns);
+    const stringValues = extractStringValues(req.body);
+    for (const value of stringValues) {
+      const patterns = detectAttackPatterns(value);
+      suspiciousPatterns.push(...patterns);
+    }
   }
   
   // Vérifier les query params
   if (req.query) {
-    const queryStr = JSON.stringify(req.query);
-    const queryPatterns = detectAttackPatterns(queryStr);
-    suspiciousPatterns.push(...queryPatterns);
+    const stringValues = extractStringValues(req.query);
+    for (const value of stringValues) {
+      const patterns = detectAttackPatterns(value);
+      suspiciousPatterns.push(...patterns);
+    }
   }
   
   // Vérifier les params
   if (req.params) {
-    const paramsStr = JSON.stringify(req.params);
-    const paramsPatterns = detectAttackPatterns(paramsStr);
-    suspiciousPatterns.push(...paramsPatterns);
+    const stringValues = extractStringValues(req.params);
+    for (const value of stringValues) {
+      const patterns = detectAttackPatterns(value);
+      suspiciousPatterns.push(...patterns);
+    }
   }
   
   // Vérifier l'URL

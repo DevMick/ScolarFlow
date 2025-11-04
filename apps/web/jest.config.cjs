@@ -5,9 +5,9 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  
+
   // Configuration pour React Testing Library
-  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
+  setupFilesAfterEnv: [],
   
   // Répertoires de tests
   testMatch: [
@@ -55,7 +55,7 @@ module.exports = {
   },
   
   // Mapping des modules
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/src/tests/__mocks__/fileMock.js'
@@ -63,8 +63,13 @@ module.exports = {
   
   // Transformation des fichiers
   transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
-    '^.+\\.(js|jsx)$': 'babel-jest'
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react-jsx',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true
+      }
+    }]
   },
   
   // Extensions de fichiers
@@ -96,7 +101,7 @@ module.exports = {
   ],
   
   // Variables d'environnement pour les tests
-  setupFiles: ['<rootDir>/src/tests/env.ts'],
+  setupFiles: [],
   
   // Timeout pour les tests
   testTimeout: 15000,
@@ -115,15 +120,5 @@ module.exports = {
   },
   
   // Reporters
-  reporters: [
-    'default',
-    [
-      'jest-html-reporters',
-      {
-        publicPath: './coverage',
-        filename: 'frontend-test-report.html',
-        expand: true
-      }
-    ]
-  ]
+  reporters: ['default']
 };

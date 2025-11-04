@@ -131,7 +131,7 @@ export class PaymentService {
   }
 
   /**
-   * Mettre à jour le statut d'un paiement
+   * Mettre à jour le statut d'un paiement (pour utilisateur normal)
    */
   static async updatePaymentStatus(paymentId: number, isPaid: boolean): Promise<PaymentResponse> {
     try {
@@ -230,7 +230,7 @@ export class PaymentService {
   /**
    * Mettre à jour le statut d'un paiement (pour l'administration)
    */
-  static async updatePaymentStatus(paymentId: number, status: 'validated' | 'rejected'): Promise<PaymentResponse> {
+  static async updateAdminPaymentStatus(paymentId: number, status: 'validated' | 'rejected'): Promise<PaymentResponse> {
     try {
       const isPaid = status === 'validated';
       const response = await apiService.put<PaymentResponse>(`/admin/payments/${paymentId}/status`, {
