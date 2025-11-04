@@ -28,23 +28,25 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        // Forcer un seul chunk pour éviter les problèmes de partage des helpers
+        manualChunks: (id) => {
+          // Tout mettre dans un seul chunk pour éviter les problèmes d'interopération
+          return 'index'
+        },
         // Assurer la compatibilité avec les modules CommonJS/ESM
         format: 'es',
         // Utiliser 'default' pour forcer l'injection inline des helpers
         interop: 'default',
-        // Générer le code de manière compatible avec injection inline des helpers
+        // Générer le code de manière compatible
         generatedCode: {
           constBindings: true,
-          objectShorthand: true,
-          // Préserver les helpers inline pour éviter les problèmes de références
-          preserveAll: false
+          objectShorthand: true
         },
         // Préserver les helpers d'interopération
         exports: 'named',
         // Préserver les noms de fonctions pour éviter les problèmes
         preserveModules: false,
-        // Forcer l'injection inline des helpers d'interopération
+        // S'assurer que les helpers sont injectés inline
         inlineDynamicImports: false
       },
       external: [],
@@ -58,11 +60,11 @@ export default defineConfig({
       }
     },
     commonjsOptions: {
-      include: [/node_modules/],
+      include: [/node_modules/, /packages\/shared/],
       transformMixedEsModules: true,
-      // Utiliser 'auto' pour une meilleure détection automatique
-      defaultIsModuleExports: 'auto',
-      requireReturnsDefault: 'auto',
+      // Forcer la transformation complète pour éviter les problèmes d'interopération
+      defaultIsModuleExports: true,
+      requireReturnsDefault: true,
       // Ne pas utiliser esmExternals en production pour éviter les problèmes
       esmExternals: false,
       // Gérer spécifiquement dayjs et ses plugins
@@ -70,7 +72,9 @@ export default defineConfig({
       // Forcer la transformation des modules problématiques
       strictRequires: false,
       // Forcer la transformation de tous les requires
-      dynamicRequireTargets: []
+      dynamicRequireTargets: [],
+      // Forcer la transformation de tous les modules CommonJS
+      ignore: []
     },
     // Optimisations pour la production
     minify: 'esbuild',
