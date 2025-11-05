@@ -223,20 +223,26 @@ async function handler(req: any, res: any) {
     
     // Réponse d'erreur par défaut si l'initialisation échoue
     // Toujours afficher l'erreur en développement pour le diagnostic
+    // En production Vercel, afficher aussi les détails pour le débogage initial
     const isDevelopment = process.env.NODE_ENV === 'development' || 
                           process.env.VERCEL_ENV === 'development' || 
                           process.env.VERCEL_ENV === 'preview';
+    
+    // Pour Vercel, toujours afficher les détails d'erreur pour le débogage
+    const showErrorDetails = isDevelopment || process.env.VERCEL === '1';
     
     if (!res.headersSent) {
       try {
         res.status(500).json({
           success: false,
           message: 'Erreur interne du serveur',
-          error: isDevelopment 
+          error: showErrorDetails 
             ? {
                 message: error?.message || String(error),
                 name: error?.name,
-                stack: error?.stack
+                stack: error?.stack,
+                code: error?.code,
+                cause: error?.cause
               }
             : undefined
         });
