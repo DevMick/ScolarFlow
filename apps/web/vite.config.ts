@@ -28,15 +28,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Forcer un seul chunk pour éviter les problèmes de partage des helpers
-        manualChunks: (id) => {
-          // Tout mettre dans un seul chunk pour éviter les problèmes d'interopération
-          return 'index'
-        },
+        // Ne pas utiliser manualChunks pour éviter les problèmes de partage
+        manualChunks: undefined,
         // Assurer la compatibilité avec les modules CommonJS/ESM
         format: 'es',
-        // Utiliser 'default' pour forcer l'injection inline des helpers
-        interop: 'default',
+        // Utiliser 'auto' pour une détection automatique plus robuste
+        interop: 'auto',
         // Générer le code de manière compatible
         generatedCode: {
           constBindings: true,
@@ -60,7 +57,8 @@ export default defineConfig({
       }
     },
     commonjsOptions: {
-      include: [/node_modules/, /packages\/shared/],
+      // Forcer la transformation de TOUS les modules CommonJS
+      include: [/node_modules/, /packages\/shared/, /\.js$/],
       transformMixedEsModules: true,
       // Forcer la transformation complète pour éviter les problèmes d'interopération
       defaultIsModuleExports: true,
@@ -73,13 +71,15 @@ export default defineConfig({
       strictRequires: false,
       // Forcer la transformation de tous les requires
       dynamicRequireTargets: [],
-      // Forcer la transformation de tous les modules CommonJS
+      // Ne rien ignorer - tout transformer
       ignore: []
     },
     // Optimisations pour la production
     minify: 'esbuild',
     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     sourcemap: false,
+    // Désactiver temporairement la minification pour tester si c'est la cause
+    // minify: false,
     // Forcer la transformation de tous les modules
     modulePreload: false,
     // Forcer le chunking pour éviter les problèmes
