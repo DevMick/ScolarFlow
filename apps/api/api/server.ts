@@ -23,17 +23,25 @@ async function initializeImports() {
   }
   
   try {
+    console.log('Initializing imports...');
     const serverModule = await import('../src/server');
     app = serverModule.app;
     prisma = serverModule.prisma;
+    console.log('Server module imported');
     
     const loggerModule = await import('../src/utils/logger');
     Logger = loggerModule.Logger;
+    console.log('Logger module imported');
     
     const serverlessModule = await import('serverless-http');
     serverless = serverlessModule.default;
+    console.log('Serverless module imported');
   } catch (error) {
     console.error('Failed to import modules:', error);
+    console.error('Import error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
     throw error;
   }
 }
@@ -55,8 +63,11 @@ async function ensureInitialized(): Promise<void> {
   if (!initializationPromise) {
     initializationPromise = (async () => {
       try {
+        console.log('Starting Vercel initialization...');
+        
         // Initialiser les imports d'abord
         await initializeImports();
+        console.log('Imports initialized');
         
         // S'assurer que VERCEL est défini pour forcer l'initialisation
         if (!process.env.VERCEL) {
@@ -65,8 +76,10 @@ async function ensureInitialized(): Promise<void> {
 
         // Vérifier que DATABASE_URL est défini
         if (!process.env.DATABASE_URL) {
+          console.error('DATABASE_URL is not set');
           throw new Error('DATABASE_URL environment variable is not set');
         }
+        console.log('DATABASE_URL is set');
 
         // Test database connection avec timeout
         try {
@@ -163,17 +176,25 @@ async function getHandler() {
 // Pour CommonJS, on utilise module.exports
 async function handler(req: any, res: any) {
   try {
+    console.log('Vercel handler called:', req.method, req.url);
+    
     // Obtenir le handler serverless (qui s'initialisera automatiquement si nécessaire)
+    console.log('Getting serverless handler...');
     const handler = await getHandler();
+    console.log('Serverless handler obtained');
     
     // Appeler le handler serverless qui gère correctement l'app Express
     // serverless-http retourne une Promise, donc on doit l'attendre
+    console.log('Calling serverless handler...');
     const result = await handler(req, res);
+    console.log('Serverless handler completed');
     return result;
   } catch (error: any) {
     // Logger peut aussi échouer, donc on utilise console.error en fallback
     console.error('Error in Vercel handler:', error);
+    console.error('Error message:', error?.message);
     console.error('Error stack:', error?.stack);
+    console.error('Error name:', error?.name);
     
     try {
       if (Logger) {
@@ -184,13 +205,22 @@ async function handler(req: any, res: any) {
     }
     
     // Réponse d'erreur par défaut si l'initialisation échoue
+    // Toujours afficher l'erreur en développement pour le diagnostic
+    const isDevelopment = process.env.NODE_ENV === 'development' || 
+                          process.env.VERCEL_ENV === 'development' || 
+                          process.env.VERCEL_ENV === 'preview';
+    
     if (!res.headersSent) {
       try {
         res.status(500).json({
           success: false,
           message: 'Erreur interne du serveur',
-          error: process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'development' 
-            ? (error?.message || String(error)) 
+          error: isDevelopment 
+            ? {
+                message: error?.message || String(error),
+                name: error?.name,
+                stack: error?.stack
+              }
             : undefined
         });
       } catch (sendError) {
