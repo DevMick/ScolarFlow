@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "declaration": false,
     "declarationMap": false,
-    "sourceMap": true,
+    "sourceMap": false,
     "removeComments": true,
     "noImplicitAny": false,
     "strictNullChecks": false,
@@ -26,7 +26,7 @@
     "noPropertyAccessFromIndexSignature": false,
     "allowUnusedLabels": true,
     "allowUnreachableCode": true,
-    "skipLibCheck": true,
+    "incremental": false,
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
