@@ -30,9 +30,9 @@ content = content.replace(/require\("\.\.\/dist\/server"/g, 'require("../dist/sr
 content = content.replace(/require\('\.\.\/dist\/server'/g, "require('../dist/src/server'");
 // Corriger les imports de ../utils/... ou ../dist/utils/... -> ../dist/src/utils/...
 content = content.replace(/require\("\.\.\/utils\//g, 'require("../dist/src/utils/');
-content = content.replace(/require\('\.\.\/utils\//g, "require('../dist/src/utils/');
+content = content.replace(/require\('\.\.\/utils\//g, "require('../dist/src/utils/')");
 content = content.replace(/require\("\.\.\/dist\/utils\//g, 'require("../dist/src/utils/');
-content = content.replace(/require\('\.\.\/dist\/utils\//g, "require('../dist/src/utils/');
+content = content.replace(/require\('\.\.\/dist\/utils\//g, "require('../dist/src/utils/')");
 // Corriger les imports de ../routes ou ../dist/routes -> ../dist/src/routes
 content = content.replace(/require\("\.\.\/routes"/g, 'require("../dist/src/routes"');
 content = content.replace(/require\('\.\.\/routes'/g, "require('../dist/src/routes'");
@@ -41,9 +41,9 @@ content = content.replace(/require\('\.\.\/dist\/routes'/g, "require('../dist/sr
 // Corriger les imports de ../middleware/... ou ../dist/middleware/... -> ../dist/src/middleware/...
 // (car TypeScript compile src/ vers dist/src/ avec rootDir=".")
 content = content.replace(/require\("\.\.\/middleware\//g, 'require("../dist/src/middleware/');
-content = content.replace(/require\('\.\.\/middleware\//g, "require('../dist/src/middleware/");
+content = content.replace(/require\('\.\.\/middleware\//g, "require('../dist/src/middleware/')");
 content = content.replace(/require\("\.\.\/dist\/middleware\//g, 'require("../dist/src/middleware/');
-content = content.replace(/require\('\.\.\/dist\/middleware\//g, "require('../dist/src/middleware/");
+content = content.replace(/require\('\.\.\/dist\/middleware\//g, "require('../dist/src/middleware/')");
 
 // Supprimer la ligne const path = require('path'); si elle n'est pas utilisée
 content = content.replace(/const path = require\('path'\);?\s*\n/g, '');
