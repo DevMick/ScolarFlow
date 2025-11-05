@@ -1,10 +1,14 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import fixInteropRequireDefault from './vite-plugin-fix-interop.js'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    fixInteropRequireDefault()
+  ],
   server: {
     port: 3000,
     host: true,
@@ -50,7 +54,9 @@ export default defineConfig({
       },
       external: [],
       // Forcer la transformation de tous les modules CommonJS
-      plugins: [],
+      plugins: [
+        fixInteropRequireDefault()
+      ],
       // Gérer les avertissements pour éviter les problèmes
       onwarn(warning, warn) {
         // Ignorer certains avertissements qui ne sont pas critiques
