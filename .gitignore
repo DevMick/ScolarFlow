@@ -142,3 +142,6 @@ apps/web/.env
 
 # Turbo
 .turbo/
+
+# Fichiers générés pour Vercel (ne pas committer)
+apps/api/api/server.js
