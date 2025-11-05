@@ -75,7 +75,8 @@ async function ensureInitialized(): Promise<void> {
 
 // Export pour Vercel (format serverless function)
 // Vercel attend un handler qui gère (req, res)
-export default async function handler(req: any, res: any) {
+// Pour CommonJS, on utilise module.exports
+async function handler(req: any, res: any) {
   try {
     // Attendre que l'initialisation soit terminée avant de traiter la requête
     await ensureInitialized();
@@ -96,3 +97,6 @@ export default async function handler(req: any, res: any) {
     }
   }
 }
+
+// Export pour Vercel (CommonJS)
+module.exports = handler;
