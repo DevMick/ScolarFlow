@@ -1,12 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "cd ../.. && npx --yes pnpm@8.12.0 install && cd apps/api && npx --yes pnpm@8.12.0 build",
+  "buildCommand": "corepack enable && corepack prepare pnpm@8.12.0 --activate && corepack pnpm install --no-frozen-lockfile && corepack pnpm --filter @edustats/shared build && corepack pnpm --filter @edustats/api build",
   "outputDirectory": "dist",
-  "devCommand": "cd ../.. && npx --yes pnpm@8.12.0 install && cd apps/api && npx --yes pnpm@8.12.0 dev",
-  "installCommand": "cd ../.. && npx --yes pnpm@8.12.0 install",
+  "installCommand": "corepack enable && corepack prepare pnpm@8.12.0 --activate && corepack pnpm install --no-frozen-lockfile",
   "framework": null,
   "functions": {
-    "api/**/*.ts": {
+    "api/server.js": {
       "memory": 1024,
       "maxDuration": 30
     }

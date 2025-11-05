@@ -2,6 +2,7 @@
 /**
  * Script pour corriger les imports dans dist/api/server.js
  * TypeScript compile les imports depuis src/, mais au runtime, les fichiers sont dans dist/
+ * Aussi, corrige l'export pour Vercel (module.exports au lieu de exports.default)
  */
 
 const fs = require('fs');
@@ -23,6 +24,14 @@ content = content.replace(/require\('\.\.\/src\//g, "require('../");
 // Supprimer la ligne const path = require('path'); si elle n'est pas utilisée
 content = content.replace(/const path = require\('path'\);?\s*\n/g, '');
 
+// Corriger l'export pour Vercel: exports.default -> module.exports
+// Si on a exports.default = handler, on le remplace par module.exports = handler
+content = content.replace(/exports\.default\s*=\s*handler\s*;/, 'module.exports = handler;');
+// Si on a exports.default = handler; à la fin, on le remplace
+if (content.includes('exports.default = handler;')) {
+  content = content.replace(/exports\.default\s*=\s*handler\s*;/, 'module.exports = handler;');
+}
+
 fs.writeFileSync(distApiServerPath, content, 'utf8');
-console.log('✅ Fixed imports in dist/api/server.js');
+console.log('✅ Fixed imports and exports in dist/api/server.js');
 

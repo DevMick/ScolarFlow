@@ -82,7 +82,7 @@ export default async function handler(req: any, res: any) {
 
     // Passer la requête à l'app Express
     // L'app Express est maintenant complètement configurée
-    return app(req, res);
+    app(req, res);
   } catch (error: any) {
     Logger.error('Error in Vercel handler', error);
     
