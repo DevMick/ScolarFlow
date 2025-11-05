@@ -3,8 +3,8 @@
 // ========================================
 
 import { z } from 'zod';
-import { VALIDATION_MESSAGES, getValidationMessage } from './messages';
-import { absentReasonSchema } from './evaluation';
+import { VALIDATION_MESSAGES, getValidationMessage } from './messages.js';
+import { absentReasonSchema } from './evaluation.js';
 
 // ========================================
 // SCHÉMAS DE BASE POUR RÉSULTATS

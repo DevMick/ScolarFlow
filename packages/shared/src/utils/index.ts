@@ -1,2 +1,2 @@
-export * from './schoolYear';
+export * from './schoolYear.js';
 

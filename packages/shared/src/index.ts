@@ -1,8 +1,8 @@
 // Export des types
-export * from './types';
+export * from './types/index.js';
 
 // Export des utilitaires
-export * from './utils';
+export * from './utils/index.js';
 
 // Export sélectif de la validation pour éviter les conflits
 export {
@@ -45,4 +45,4 @@ export {
   formatZodErrors,
   validateWithRetry,
   RealTimeValidator
-} from './validation';
+} from './validation/index.js';

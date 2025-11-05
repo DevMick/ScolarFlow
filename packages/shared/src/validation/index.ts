@@ -5,10 +5,10 @@
 // ========================================
 // VALIDATION EXISTANTE (PHASES PRÉCÉDENTES)
 // ========================================
-export * from './auth';
-export * from './schoolYear';
-export * from './class';
-export * from './student';
+export * from './auth.js';
+export * from './schoolYear.js';
+export * from './class.js';
+export * from './student.js';
 
 // ========================================
 // NOUVELLE VALIDATION ÉVALUATIONS (PHASE 4)
@@ -35,7 +35,7 @@ export {
   type EvaluationFiltersValidationInput,
   type FinalizeEvaluationValidationInput,
   type DuplicateEvaluationValidationInput,
-} from './evaluation';
+} from './evaluation.js';
 
 // Schémas de résultats
 export {
@@ -60,7 +60,7 @@ export {
   type EvaluationResultWithMaxValidationInput,
   type EvaluationResultWithContextValidationInput,
   type BulkResultsWithContextValidationInput,
-} from './result';
+} from './result.js';
 
 // Messages d'erreur
 export {
@@ -69,7 +69,7 @@ export {
   getValidationMessage,
   getMessagesByCategory,
   type ValidationMessage,
-} from './messages';
+} from './messages.js';
 
 // ========================================
 // UTILITAIRES DE VALIDATION
@@ -102,14 +102,14 @@ export {
   // Helpers métier
   validateUserPermissions,
   validateTemporalConsistency,
-} from '../utils/validation';
+} from '../utils/validation.js';
 
 // ========================================
 // SCHÉMAS GÉNÉRIQUES RÉUTILISABLES
 // ========================================
 
 import { z } from 'zod';
-import { VALIDATION_MESSAGES } from './messages';
+import { VALIDATION_MESSAGES } from './messages.js';
 
 // Pagination standard
 export const paginationSchema = z.object({
@@ -353,4 +353,4 @@ export {
   
   // Messages de validation
   TABLE_VALIDATION_MESSAGES
-} from './tables';
+} from './tables.js';

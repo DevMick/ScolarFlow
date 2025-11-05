@@ -3,7 +3,7 @@
 // ========================================
 
 import { z } from 'zod';
-import { VALIDATION_MESSAGES, getValidationMessage } from './messages';
+import { VALIDATION_MESSAGES, getValidationMessage } from './messages.js';
 
 // ========================================
 // SCHÉMAS DE BASE - ÉNUMÉRATIONS

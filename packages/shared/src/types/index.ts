@@ -1,14 +1,14 @@
 // Export des types spécialisés
-export * from './auth';
-export * from './schoolYear';
-export * from './class';
-export * from './student';
-export * from './subject';
-export * from './evaluationFormula';
-export * from './note';
-export * from './evaluationSimple';
-export * from './evaluation';
-export * from './statistics';
-export * from './tables';
-export * from './reports'; // Phase 7 - Bilans Annuels
-export * from './common';
+export * from './auth.js';
+export * from './schoolYear.js';
+export * from './class.js';
+export * from './student.js';
+export * from './subject.js';
+export * from './evaluationFormula.js';
+export * from './note.js';
+export * from './evaluationSimple.js';
+export * from './evaluation.js';
+export * from './statistics.js';
+export * from './tables.js';
+export * from './reports.js'; // Phase 7 - Bilans Annuels
+export * from './common.js';

@@ -2,9 +2,9 @@
 // TYPES BILANS ANNUELS - PHASE 7
 // ========================================
 
-import type { Student } from './student';
-import type { Evaluation, EvaluationResult } from './evaluation';
-import type { Class } from './class';
+import type { Student } from './student.js';
+import type { Evaluation, EvaluationResult } from './evaluation.js';
+import type { Class } from './class.js';
 
 /**
  * Types de profils d'élèves détectés automatiquement
