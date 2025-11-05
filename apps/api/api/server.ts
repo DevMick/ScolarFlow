@@ -24,25 +24,62 @@ async function initializeImports() {
   
   try {
     console.log('Initializing imports...');
+    const path = require('path');
+    const fs = require('fs');
+    
     // En production (Vercel), utiliser les fichiers compilés dans dist/src/
-    // Depuis apps/api/api/server.js (compilé), le chemin vers apps/api/dist/src/ est ../dist/src/
     // En développement, utiliser les fichiers source dans src/
     const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
-    // Dans Vercel, depuis /var/task/apps/api/api/server.js vers /var/task/apps/api/dist/src/server.js
-    // Le chemin est ../dist/src/server
-    const serverPath = isProduction ? '../dist/src/server' : '../src/server';
-    const utilsPath = isProduction ? '../dist/src/utils' : '../src/utils';
-    const middlewarePath = isProduction ? '../dist/src/middleware' : '../src/middleware';
-    const routesPath = isProduction ? '../dist/src/routes' : '../src/routes';
     
-    const serverModule = await import(serverPath);
+    // Résoudre les chemins de manière absolue depuis __dirname
+    // __dirname est le dossier où se trouve api/server.js (compilé)
+    const apiDir = __dirname; // /var/task/apps/api/api
+    const projectRoot = path.resolve(apiDir, '..'); // /var/task/apps/api
+    
+    // Déterminer le chemin vers dist/src/ ou src/
+    const srcDir = path.join(projectRoot, isProduction ? 'dist' : '', 'src');
+    
+    // Vérifier si le dossier dist existe, sinon utiliser src
+    let actualSrcDir = srcDir;
+    if (isProduction && !fs.existsSync(srcDir)) {
+      console.warn('dist/src not found, trying src/');
+      actualSrcDir = path.join(projectRoot, 'src');
+    }
+    
+    // Utiliser des chemins absolus convertis en chemins relatifs pour import()
+    // ou utiliser require.resolve() pour CommonJS
+    const serverPath = path.join(actualSrcDir, 'server');
+    const utilsPath = path.join(actualSrcDir, 'utils');
+    const middlewarePath = path.join(actualSrcDir, 'middleware');
+    const routesPath = path.join(actualSrcDir, 'routes');
+    
+    // Convertir en chemins relatifs depuis api/server.js
+    const relativeServerPath = path.relative(apiDir, serverPath);
+    const relativeUtilsPath = path.relative(apiDir, utilsPath);
+    const relativeMiddlewarePath = path.relative(apiDir, middlewarePath);
+    const relativeRoutesPath = path.relative(apiDir, routesPath);
+    
+    // Normaliser les chemins pour import() (utiliser / au lieu de \)
+    const normalizedServerPath = relativeServerPath.replace(/\\/g, '/');
+    const normalizedUtilsPath = relativeUtilsPath.replace(/\\/g, '/');
+    const normalizedMiddlewarePath = relativeMiddlewarePath.replace(/\\/g, '/');
+    const normalizedRoutesPath = relativeRoutesPath.replace(/\\/g, '/');
+    
+    console.log('Import paths:', {
+      serverPath: normalizedServerPath,
+      utilsPath: normalizedUtilsPath,
+      actualSrcDir,
+      isProduction
+    });
+    
+    const serverModule = await import(normalizedServerPath);
     app = serverModule.app;
     prisma = serverModule.prisma;
-    console.log('Server module imported from:', serverPath);
+    console.log('Server module imported from:', normalizedServerPath);
     
-    const loggerModule = await import(`${utilsPath}/logger`);
+    const loggerModule = await import(`${normalizedUtilsPath}/logger`);
     Logger = loggerModule.Logger;
-    console.log('Logger module imported from:', `${utilsPath}/logger`);
+    console.log('Logger module imported from:', `${normalizedUtilsPath}/logger`);
     
     const serverlessModule = await import('serverless-http');
     serverless = serverlessModule.default;
@@ -107,12 +144,27 @@ async function ensureInitialized(): Promise<void> {
         }
 
         // Déterminer les chemins selon l'environnement
-        // Dans Vercel, depuis /var/task/apps/api/api/server.js vers /var/task/apps/api/dist/src/
-        // Le chemin est ../dist/src/
+        const path = require('path');
+        const fs = require('fs');
         const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
-        const utilsPath = isProduction ? '../dist/src/utils' : '../src/utils';
-        const middlewarePath = isProduction ? '../dist/src/middleware' : '../src/middleware';
-        const routesPath = isProduction ? '../dist/src/routes' : '../src/routes';
+        
+        // Résoudre les chemins de manière absolue depuis __dirname
+        const apiDir = __dirname; // /var/task/apps/api/api
+        const projectRoot = path.resolve(apiDir, '..'); // /var/task/apps/api
+        
+        // Déterminer le chemin vers dist/src/ ou src/
+        const srcDir = path.join(projectRoot, isProduction ? 'dist' : '', 'src');
+        
+        // Vérifier si le dossier dist existe, sinon utiliser src
+        let actualSrcDir = srcDir;
+        if (isProduction && !fs.existsSync(srcDir)) {
+          console.warn('dist/src not found, trying src/');
+          actualSrcDir = path.join(projectRoot, 'src');
+        }
+        
+        const utilsPath = path.relative(apiDir, path.join(actualSrcDir, 'utils')).replace(/\\/g, '/');
+        const middlewarePath = path.relative(apiDir, path.join(actualSrcDir, 'middleware')).replace(/\\/g, '/');
+        const routesPath = path.relative(apiDir, path.join(actualSrcDir, 'routes')).replace(/\\/g, '/');
 
         // Initialize file directories (avec gestion d'erreur)
         try {
