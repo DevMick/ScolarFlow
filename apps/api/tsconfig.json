@@ -39,7 +39,7 @@
   },
   "include": [
     "src/**/*",
-    "src/types/stubs/**/*",
+    "src/types/**/*",
     "api/**/*"
   ],
   "exclude": [

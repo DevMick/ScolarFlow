@@ -9,6 +9,8 @@
  */
 
 // Importer l'app Express et prisma depuis src/server
+/// <reference path="../src/types/express.d.ts" />
+
 import { app, prisma } from '../src/server';
 import { Logger } from '../src/utils/logger';
 import serverless from 'serverless-http';
