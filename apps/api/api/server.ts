@@ -24,14 +24,24 @@ async function initializeImports() {
   
   try {
     console.log('Initializing imports...');
-    const serverModule = await import('../src/server');
+    // En production (Vercel), utiliser les fichiers compilés dans dist/
+    // Depuis dist/api/server.js, le chemin vers dist/src/ est ../src/
+    // En développement, utiliser les fichiers source dans src/
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+    // Depuis dist/api/, le chemin vers dist/src/ est ../src/ (pas ../dist/src/)
+    const serverPath = isProduction ? '../src/server' : '../src/server';
+    const utilsPath = isProduction ? '../src/utils' : '../src/utils';
+    const middlewarePath = isProduction ? '../src/middleware' : '../src/middleware';
+    const routesPath = isProduction ? '../src/routes' : '../src/routes';
+    
+    const serverModule = await import(serverPath);
     app = serverModule.app;
     prisma = serverModule.prisma;
-    console.log('Server module imported');
+    console.log('Server module imported from:', serverPath);
     
-    const loggerModule = await import('../src/utils/logger');
+    const loggerModule = await import(`${utilsPath}/logger`);
     Logger = loggerModule.Logger;
-    console.log('Logger module imported');
+    console.log('Logger module imported from:', `${utilsPath}/logger`);
     
     const serverlessModule = await import('serverless-http');
     serverless = serverlessModule.default;
@@ -95,9 +105,16 @@ async function ensureInitialized(): Promise<void> {
           throw new Error(`Database connection failed: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
         }
 
+        // Déterminer les chemins selon l'environnement
+        // Depuis dist/api/, le chemin vers dist/src/ est ../src/ (pas ../dist/src/)
+        const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+        const utilsPath = isProduction ? '../src/utils' : '../src/utils';
+        const middlewarePath = isProduction ? '../src/middleware' : '../src/middleware';
+        const routesPath = isProduction ? '../src/routes' : '../src/routes';
+
         // Initialize file directories (avec gestion d'erreur)
         try {
-          const { ensureDirectories } = await import('../src/utils/fileUpload');
+          const { ensureDirectories } = await import(`${utilsPath}/fileUpload`);
           ensureDirectories();
           Logger.info('File directories initialized (Vercel)');
         } catch (dirError) {
@@ -108,7 +125,7 @@ async function ensureInitialized(): Promise<void> {
         // Les routes sont déjà montées dans src/server.ts
         // On ajoute juste les routes de createApiRoutes si nécessaire
         try {
-          const { createApiRoutes } = await import('../src/routes');
+          const { createApiRoutes } = await import(routesPath);
           const apiRoutes = await createApiRoutes(prisma);
           
           // Ajouter les routes de createApiRoutes (pour les routes qui ne sont pas déjà montées)
@@ -121,8 +138,8 @@ async function ensureInitialized(): Promise<void> {
 
         // Error handling middleware (must be last)
         try {
-          const { notFoundHandler } = await import('../src/middleware/errorHandler');
-          const { secureErrorHandler } = await import('../src/middleware/errorHandler.security');
+          const { notFoundHandler } = await import(`${middlewarePath}/errorHandler`);
+          const { secureErrorHandler } = await import(`${middlewarePath}/errorHandler.security`);
           app.use(notFoundHandler);
           app.use(secureErrorHandler);
         } catch (middlewareError) {

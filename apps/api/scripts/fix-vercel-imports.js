@@ -20,9 +20,11 @@ if (!fs.existsSync(distApiServerPath)) {
 
 let content = fs.readFileSync(distApiServerPath, 'utf8');
 
-// Corriger les imports: ../src/... -> ../dist/...
-content = content.replace(/require\("\.\.\/src\//g, 'require("../dist/');
-content = content.replace(/require\('\.\.\/src\//g, "require('../dist/");
+// Corriger les imports: ../src/... -> ../src/... (depuis dist/api/, le chemin vers dist/src/ est ../src/)
+// Note: TypeScript peut compiler avec ../dist/src/ ou ../src/, on doit corriger les deux cas
+content = content.replace(/require\("\.\.\/dist\/src\//g, 'require("../src/');
+content = content.replace(/require\('\.\.\/dist\/src\//g, "require('../src/");
+// Garder ../src/ tel quel car depuis dist/api/, ../src/ pointe vers dist/src/
 // Corriger aussi les imports directs de ../server ou ../dist/server -> ../dist/src/server
 content = content.replace(/require\("\.\.\/server"/g, 'require("../dist/src/server"');
 content = content.replace(/require\('\.\.\/server'/g, "require('../dist/src/server'");
