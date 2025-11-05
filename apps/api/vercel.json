@@ -4,12 +4,6 @@
   "outputDirectory": ".",
   "installCommand": "corepack enable && corepack prepare pnpm@8.12.0 --activate && corepack pnpm install --no-frozen-lockfile",
   "framework": null,
-  "functions": {
-    "api/server.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
