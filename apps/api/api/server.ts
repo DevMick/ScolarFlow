@@ -11,6 +11,7 @@
 // Importer l'app Express et prisma depuis src/server
 import { app, prisma } from '../src/server';
 import { Logger } from '../src/utils/logger';
+import serverless from 'serverless-http';
 
 // Variable pour suivre l'état de l'initialisation
 let isInitialized = false;
@@ -109,34 +110,33 @@ async function ensureInitialized(): Promise<void> {
   return initializationPromise;
 }
 
+// Créer le handler serverless avec serverless-http
+// Cela convertit l'app Express en handler compatible avec les serverless functions
+let serverlessHandler: any = null;
+
+async function getHandler() {
+  if (!serverlessHandler) {
+    // Attendre que l'initialisation soit terminée
+    await ensureInitialized();
+    
+    // Créer le handler serverless avec l'app Express
+    serverlessHandler = serverless(app, {
+      binary: ['image/*', 'application/pdf', 'application/octet-stream'],
+    });
+  }
+  return serverlessHandler;
+}
+
 // Export pour Vercel (format serverless function)
 // Vercel attend un handler qui gère (req, res)
 // Pour CommonJS, on utilise module.exports
 async function handler(req: any, res: any) {
   try {
-    // Attendre que l'initialisation soit terminée avant de traiter la requête
-    await ensureInitialized();
-
-    // Passer la requête à l'app Express
-    // L'app Express est maintenant complètement configurée
-    // Express implémente l'interface RequestHandler qui peut être appelée avec (req, res, next)
-    // Pour Vercel, on n'a pas de next, donc on utilise un callback vide
-    app(req, res, (err: any) => {
-      if (err && !res.headersSent) {
-        console.error('Error in Express handler:', err);
-        try {
-          res.status(500).json({
-            success: false,
-            message: 'Erreur interne du serveur',
-            error: process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'development' 
-              ? (err?.message || String(err)) 
-              : undefined
-          });
-        } catch (sendError) {
-          console.error('Failed to send error response:', sendError);
-        }
-      }
-    });
+    // Obtenir le handler serverless (qui s'initialisera automatiquement si nécessaire)
+    const handler = await getHandler();
+    
+    // Appeler le handler serverless qui gère correctement l'app Express
+    return handler(req, res);
   } catch (error: any) {
     // Logger peut aussi échouer, donc on utilise console.error en fallback
     try {
