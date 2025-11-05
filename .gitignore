@@ -144,4 +144,4 @@ apps/web/.env
 .turbo/
 
 # Fichiers générés pour Vercel (ne pas committer)
-# Note: api/server.js est maintenant committé pour que Vercel le trouve
+apps/api/api/server.js

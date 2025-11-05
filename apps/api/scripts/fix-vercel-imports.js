@@ -20,69 +20,56 @@ if (!fs.existsSync(distApiServerPath)) {
 
 let content = fs.readFileSync(distApiServerPath, 'utf8');
 
-// Corriger les imports: ../src/... -> ../dist/src/... (depuis api/, le chemin vers dist/src/ est ../dist/src/)
-// Note: TypeScript compile api/server.ts et les imports dynamiques doivent pointer vers ../dist/src/
-// Dans Vercel, depuis /var/task/apps/api/api/server.js vers /var/task/apps/api/dist/src/server.js
+// Fonction pour corriger les imports dans un fichier
+function fixImportsInFile(filePath, fileContent) {
+  let fixedContent = fileContent;
+  
+  // Corriger les imports dans __importStar(require(...))
+  fixedContent = fixedContent.replace(/__importStar\(require\("\.\.\/src\//g, '__importStar(require("../dist/src/');
+  fixedContent = fixedContent.replace(/__importStar\(require\('\.\.\/src\//g, "__importStar(require('../dist/src/");
+  fixedContent = fixedContent.replace(/__importStar\(require\("\.\.\/src\/server"\)/g, '__importStar(require("../dist/src/server")');
+  fixedContent = fixedContent.replace(/__importStar\(require\('\.\.\/src\/server'\)/g, "__importStar(require('../dist/src/server')");
+  fixedContent = fixedContent.replace(/__importStar\(require\("\.\.\/src\/utils\//g, '__importStar(require("../dist/src/utils/');
+  fixedContent = fixedContent.replace(/__importStar\(require\('\.\.\/src\/utils\//g, "__importStar(require('../dist/src/utils/");
+  fixedContent = fixedContent.replace(/__importStar\(require\("\.\.\/src\/routes"\)/g, '__importStar(require("../dist/src/routes")');
+  fixedContent = fixedContent.replace(/__importStar\(require\('\.\.\/src\/routes'\)/g, "__importStar(require('../dist/src/routes')");
+  fixedContent = fixedContent.replace(/__importStar\(require\("\.\.\/src\/middleware\//g, '__importStar(require("../dist/src/middleware/');
+  fixedContent = fixedContent.replace(/__importStar\(require\('\.\.\/src\/middleware\//g, "__importStar(require('../dist/src/middleware/");
 
-// TypeScript compile les imports dynamiques en __importStar(require(...))
-// Il faut corriger les require() à l'intérieur de __importStar()
+  // Corriger les require() directs
+  fixedContent = fixedContent.replace(/require\("\.\.\/src\//g, 'require("../dist/src/');
+  fixedContent = fixedContent.replace(/require\('\.\.\/src\//g, "require('../dist/src/");
+  fixedContent = fixedContent.replace(/require\("\.\.\/server"/g, 'require("../dist/src/server"');
+  fixedContent = fixedContent.replace(/require\('\.\.\/server'/g, "require('../dist/src/server'");
+  fixedContent = fixedContent.replace(/require\("\.\.\/dist\/server"/g, 'require("../dist/src/server"');
+  fixedContent = fixedContent.replace(/require\('\.\.\/dist\/server'/g, "require('../dist/src/server'");
+  fixedContent = fixedContent.replace(/require\("\.\.\/utils\//g, 'require("../dist/src/utils/');
+  fixedContent = fixedContent.replace(/require\('\.\.\/utils\//g, "require('../dist/src/utils/')");
+  fixedContent = fixedContent.replace(/require\("\.\.\/dist\/utils\//g, 'require("../dist/src/utils/');
+  fixedContent = fixedContent.replace(/require\('\.\.\/dist\/utils\//g, "require('../dist/src/utils/')");
+  fixedContent = fixedContent.replace(/require\("\.\.\/routes"/g, 'require("../dist/src/routes"');
+  fixedContent = fixedContent.replace(/require\('\.\.\/routes'/g, "require('../dist/src/routes'");
+  fixedContent = fixedContent.replace(/require\("\.\.\/dist\/routes"/g, 'require("../dist/src/routes"');
+  fixedContent = fixedContent.replace(/require\('\.\.\/dist\/routes'/g, "require('../dist/src/routes'");
+  fixedContent = fixedContent.replace(/require\("\.\.\/middleware\//g, 'require("../dist/src/middleware/');
+  fixedContent = fixedContent.replace(/require\('\.\.\/middleware\//g, "require('../dist/src/middleware/')");
+  fixedContent = fixedContent.replace(/require\("\.\.\/dist\/middleware\//g, 'require("../dist/src/middleware/');
+  fixedContent = fixedContent.replace(/require\('\.\.\/dist\/middleware\//g, "require('../dist/src/middleware/')");
 
-// Corriger les imports dans __importStar(require(...)) - format: __importStar(require('../src/...'))
-content = content.replace(/__importStar\(require\("\.\.\/src\//g, '__importStar(require("../dist/src/');
-content = content.replace(/__importStar\(require\('\.\.\/src\//g, "__importStar(require('../dist/src/");
+  // Corriger l'export
+  fixedContent = fixedContent.replace(/exports\.default\s*=\s*handler\s*;/, 'module.exports = handler;');
+  if (fixedContent.includes('exports.default = handler;')) {
+    fixedContent = fixedContent.replace(/exports\.default\s*=\s*handler\s*;/, 'module.exports = handler;');
+  }
 
-// Corriger les imports directs de ../src/server -> ../dist/src/server dans __importStar
-content = content.replace(/__importStar\(require\("\.\.\/src\/server"\)/g, '__importStar(require("../dist/src/server")');
-content = content.replace(/__importStar\(require\('\.\.\/src\/server'\)/g, "__importStar(require('../dist/src/server')");
+  return fixedContent;
+}
 
-// Corriger les imports de ../src/utils/... -> ../dist/src/utils/...
-content = content.replace(/__importStar\(require\("\.\.\/src\/utils\//g, '__importStar(require("../dist/src/utils/');
-content = content.replace(/__importStar\(require\('\.\.\/src\/utils\//g, "__importStar(require('../dist/src/utils/");
-
-// Corriger les imports de ../src/routes -> ../dist/src/routes
-content = content.replace(/__importStar\(require\("\.\.\/src\/routes"\)/g, '__importStar(require("../dist/src/routes")');
-content = content.replace(/__importStar\(require\('\.\.\/src\/routes'\)/g, "__importStar(require('../dist/src/routes')");
-
-// Corriger les imports de ../src/middleware/... -> ../dist/src/middleware/...
-content = content.replace(/__importStar\(require\("\.\.\/src\/middleware\//g, '__importStar(require("../dist/src/middleware/');
-content = content.replace(/__importStar\(require\('\.\.\/src\/middleware\//g, "__importStar(require('../dist/src/middleware/");
-
-// Aussi corriger les require() directs (pour compatibilité)
-content = content.replace(/require\("\.\.\/src\//g, 'require("../dist/src/');
-content = content.replace(/require\('\.\.\/src\//g, "require('../dist/src/");
-// Garder ../dist/src/ tel quel car c'est le bon chemin depuis api/ vers dist/src/
-// Corriger aussi les imports directs de ../server ou ../dist/server -> ../dist/src/server
-content = content.replace(/require\("\.\.\/server"/g, 'require("../dist/src/server"');
-content = content.replace(/require\('\.\.\/server'/g, "require('../dist/src/server'");
-content = content.replace(/require\("\.\.\/dist\/server"/g, 'require("../dist/src/server"');
-content = content.replace(/require\('\.\.\/dist\/server'/g, "require('../dist/src/server'");
-// Corriger les imports de ../utils/... ou ../dist/utils/... -> ../dist/src/utils/...
-content = content.replace(/require\("\.\.\/utils\//g, 'require("../dist/src/utils/');
-content = content.replace(/require\('\.\.\/utils\//g, "require('../dist/src/utils/')");
-content = content.replace(/require\("\.\.\/dist\/utils\//g, 'require("../dist/src/utils/');
-content = content.replace(/require\('\.\.\/dist\/utils\//g, "require('../dist/src/utils/')");
-// Corriger les imports de ../routes ou ../dist/routes -> ../dist/src/routes
-content = content.replace(/require\("\.\.\/routes"/g, 'require("../dist/src/routes"');
-content = content.replace(/require\('\.\.\/routes'/g, "require('../dist/src/routes'");
-content = content.replace(/require\("\.\.\/dist\/routes"/g, 'require("../dist/src/routes"');
-content = content.replace(/require\('\.\.\/dist\/routes'/g, "require('../dist/src/routes'");
-// Corriger les imports de ../middleware/... ou ../dist/middleware/... -> ../dist/src/middleware/...
-// (car TypeScript compile src/ vers dist/src/ avec rootDir=".")
-content = content.replace(/require\("\.\.\/middleware\//g, 'require("../dist/src/middleware/');
-content = content.replace(/require\('\.\.\/middleware\//g, "require('../dist/src/middleware/')");
-content = content.replace(/require\("\.\.\/dist\/middleware\//g, 'require("../dist/src/middleware/');
-content = content.replace(/require\('\.\.\/dist\/middleware\//g, "require('../dist/src/middleware/')");
+// Corriger les imports dans le contenu
+content = fixImportsInFile(distApiServerPath, content);
 
 // Supprimer la ligne const path = require('path'); si elle n'est pas utilisée
 content = content.replace(/const path = require\('path'\);?\s*\n/g, '');
-
-// Corriger l'export pour Vercel: exports.default -> module.exports
-// Si on a exports.default = handler, on le remplace par module.exports = handler
-content = content.replace(/exports\.default\s*=\s*handler\s*;/, 'module.exports = handler;');
-// Si on a exports.default = handler; à la fin, on le remplace
-if (content.includes('exports.default = handler;')) {
-  content = content.replace(/exports\.default\s*=\s*handler\s*;/, 'module.exports = handler;');
-}
 
 // Écrire le fichier corrigé dans dist/api/server.js
 fs.writeFileSync(distApiServerPath, content, 'utf8');
@@ -93,7 +80,16 @@ if (!fs.existsSync(apiDir)) {
   fs.mkdirSync(apiDir, { recursive: true });
 }
 
-// Copier le fichier vers api/server.js pour que Vercel le trouve
-fs.copyFileSync(distApiServerPath, apiServerPath);
-console.log('✅ Copied dist/api/server.js to api/server.js for Vercel');
+// Si api/server.js existe déjà (compilé par Vercel depuis api/server.ts), le corriger aussi
+if (fs.existsSync(apiServerPath)) {
+  let apiServerContent = fs.readFileSync(apiServerPath, 'utf8');
+  apiServerContent = fixImportsInFile(apiServerPath, apiServerContent);
+  apiServerContent = apiServerContent.replace(/const path = require\('path'\);?\s*\n/g, '');
+  fs.writeFileSync(apiServerPath, apiServerContent, 'utf8');
+  console.log('✅ Fixed imports and exports in api/server.js (compiled by Vercel)');
+} else {
+  // Copier le fichier vers api/server.js pour que Vercel le trouve
+  fs.copyFileSync(distApiServerPath, apiServerPath);
+  console.log('✅ Copied dist/api/server.js to api/server.js for Vercel');
+}
 
