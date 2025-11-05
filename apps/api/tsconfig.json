@@ -35,8 +35,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noEmitOnError": false,
-    "suppressImplicitAnyIndexErrors": true
+    "noEmitOnError": false
   },
   "include": [
     "src/**/*",
