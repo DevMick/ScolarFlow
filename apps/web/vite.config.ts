@@ -28,12 +28,18 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Ne pas utiliser manualChunks pour éviter les problèmes de partage
-        manualChunks: undefined,
+        // Forcer un seul chunk pour éviter les problèmes de partage des helpers
+        manualChunks: (id) => {
+          // Tout mettre dans un seul chunk pour éviter les problèmes d'interopération
+          if (id.includes('node_modules')) {
+            return 'vendor'
+          }
+          return 'index'
+        },
         // Assurer la compatibilité avec les modules CommonJS/ESM
         format: 'es',
-        // Utiliser 'auto' pour une détection automatique plus robuste
-        interop: 'auto',
+        // Utiliser 'compat' pour une meilleure compatibilité avec CommonJS
+        interop: 'compat',
         // Générer le code de manière compatible
         generatedCode: {
           constBindings: true,
@@ -75,11 +81,11 @@ export default defineConfig({
       ignore: []
     },
     // Optimisations pour la production
-    minify: 'esbuild',
+    // Désactiver temporairement la minification pour tester si c'est la cause de _interopRequireDefault
+    minify: false,
+    // minify: 'esbuild',
     target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     sourcemap: false,
-    // Désactiver temporairement la minification pour tester si c'est la cause
-    // minify: false,
     // Forcer la transformation de tous les modules
     modulePreload: false,
     // Forcer le chunking pour éviter les problèmes
