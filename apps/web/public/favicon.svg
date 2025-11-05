@@ -1,0 +1,33 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Effet de chromatic aberration (lueur colorée) pour les lettres -->
+    <filter id="chromaticAberration" x="-50%" y="-50%" width="200%" height="200%">
+      <feOffset in="SourceAlpha" dx="-1" dy="-1" result="offsetRed"/>
+      <feOffset in="SourceAlpha" dx="1" dy="1" result="offsetBlue"/>
+      <feGaussianBlur in="offsetRed" stdDeviation="0.5" result="blurRed"/>
+      <feGaussianBlur in="offsetBlue" stdDeviation="0.5" result="blurBlue"/>
+      <feFlood flood-color="#FF6B6B" flood-opacity="0.6" result="red"/>
+      <feFlood flood-color="#4ECDC4" flood-opacity="0.6" result="blue"/>
+      <feComposite in="red" in="blurRed" operator="in" result="redGlow"/>
+      <feComposite in="blue" in="blurBlue" operator="in" result="blueGlow"/>
+      <feMerge>
+        <feMergeNode in="redGlow"/>
+        <feMergeNode in="blueGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Carré avec coins très arrondis (pills-like) - fond bleu vif -->
+  <rect x="2" y="2" width="60" height="60" rx="18" ry="18" fill="#2563EB" stroke="#1E40AF" stroke-width="0.5"/>
+  
+  <!-- Lettres "SF" en blanc avec effet de chromatic aberration -->
+  <text x="32" y="40" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="central" filter="url(#chromaticAberration)">
+    SF
+  </text>
+  
+  <!-- Petite icône verte avec checkmark blanc en haut à droite -->
+  <circle cx="52" cy="12" r="7" fill="#22C55E" stroke="#16A34A" stroke-width="0.5"/>
+  <path d="M 48.5 12 L 50.5 14 L 55.5 9" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
+
