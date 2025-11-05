@@ -20,9 +20,30 @@ if (!fs.existsSync(distApiServerPath)) {
 
 let content = fs.readFileSync(distApiServerPath, 'utf8');
 
-// Corriger les imports: ../src/... -> ../...
-content = content.replace(/require\("\.\.\/src\//g, 'require("../');
-content = content.replace(/require\('\.\.\/src\//g, "require('../");
+// Corriger les imports: ../src/... -> ../dist/...
+content = content.replace(/require\("\.\.\/src\//g, 'require("../dist/');
+content = content.replace(/require\('\.\.\/src\//g, "require('../dist/");
+// Corriger aussi les imports directs de ../server ou ../dist/server -> ../dist/src/server
+content = content.replace(/require\("\.\.\/server"/g, 'require("../dist/src/server"');
+content = content.replace(/require\('\.\.\/server'/g, "require('../dist/src/server'");
+content = content.replace(/require\("\.\.\/dist\/server"/g, 'require("../dist/src/server"');
+content = content.replace(/require\('\.\.\/dist\/server'/g, "require('../dist/src/server'");
+// Corriger les imports de ../utils/... ou ../dist/utils/... -> ../dist/src/utils/...
+content = content.replace(/require\("\.\.\/utils\//g, 'require("../dist/src/utils/');
+content = content.replace(/require\('\.\.\/utils\//g, "require('../dist/src/utils/');
+content = content.replace(/require\("\.\.\/dist\/utils\//g, 'require("../dist/src/utils/');
+content = content.replace(/require\('\.\.\/dist\/utils\//g, "require('../dist/src/utils/');
+// Corriger les imports de ../routes ou ../dist/routes -> ../dist/src/routes
+content = content.replace(/require\("\.\.\/routes"/g, 'require("../dist/src/routes"');
+content = content.replace(/require\('\.\.\/routes'/g, "require('../dist/src/routes'");
+content = content.replace(/require\("\.\.\/dist\/routes"/g, 'require("../dist/src/routes"');
+content = content.replace(/require\('\.\.\/dist\/routes'/g, "require('../dist/src/routes'");
+// Corriger les imports de ../middleware/... ou ../dist/middleware/... -> ../dist/src/middleware/...
+// (car TypeScript compile src/ vers dist/src/ avec rootDir=".")
+content = content.replace(/require\("\.\.\/middleware\//g, 'require("../dist/src/middleware/');
+content = content.replace(/require\('\.\.\/middleware\//g, "require('../dist/src/middleware/");
+content = content.replace(/require\("\.\.\/dist\/middleware\//g, 'require("../dist/src/middleware/');
+content = content.replace(/require\('\.\.\/dist\/middleware\//g, "require('../dist/src/middleware/");
 
 // Supprimer la ligne const path = require('path'); si elle n'est pas utilisée
 content = content.replace(/const path = require\('path'\);?\s*\n/g, '');
