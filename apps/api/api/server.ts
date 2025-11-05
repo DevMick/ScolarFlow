@@ -34,35 +34,71 @@ async function ensureInitialized(): Promise<void> {
           process.env.VERCEL = '1';
         }
 
-        // Test database connection
-        await prisma.$connect();
-        Logger.info('Connected to PostgreSQL database (Vercel)');
+        // Vérifier que DATABASE_URL est défini
+        if (!process.env.DATABASE_URL) {
+          throw new Error('DATABASE_URL environment variable is not set');
+        }
 
-        // Initialize file directories
-        const { ensureDirectories } = await import('../src/utils/fileUpload');
-        ensureDirectories();
-        Logger.info('File directories initialized (Vercel)');
+        // Test database connection avec timeout
+        try {
+          await Promise.race([
+            prisma.$connect(),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Database connection timeout')), 10000)
+            )
+          ]);
+          Logger.info('Connected to PostgreSQL database (Vercel)');
+        } catch (dbError) {
+          console.error('Database connection error:', dbError);
+          throw new Error(`Database connection failed: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
+        }
+
+        // Initialize file directories (avec gestion d'erreur)
+        try {
+          const { ensureDirectories } = await import('../src/utils/fileUpload');
+          ensureDirectories();
+          Logger.info('File directories initialized (Vercel)');
+        } catch (dirError) {
+          console.warn('File directories initialization warning:', dirError);
+          // Ne pas bloquer si les répertoires ne peuvent pas être créés
+        }
 
         // Les routes sont déjà montées dans src/server.ts
         // On ajoute juste les routes de createApiRoutes si nécessaire
-        // Vérifier si les routes de createApiRoutes sont déjà montées
-        const { createApiRoutes } = await import('../src/routes');
-        const apiRoutes = await createApiRoutes(prisma);
-        
-        // Ajouter les routes de createApiRoutes (pour les routes qui ne sont pas déjà montées)
-        app.use('/api', apiRoutes);
-        Logger.info('Additional API routes initialized for Vercel');
+        try {
+          const { createApiRoutes } = await import('../src/routes');
+          const apiRoutes = await createApiRoutes(prisma);
+          
+          // Ajouter les routes de createApiRoutes (pour les routes qui ne sont pas déjà montées)
+          app.use('/api', apiRoutes);
+          Logger.info('Additional API routes initialized for Vercel');
+        } catch (routesError) {
+          console.warn('Routes initialization warning:', routesError);
+          // Ne pas bloquer si les routes ne peuvent pas être montées
+        }
 
         // Error handling middleware (must be last)
-        const { notFoundHandler } = await import('../src/middleware/errorHandler');
-        const { secureErrorHandler } = await import('../src/middleware/errorHandler.security');
-        app.use(notFoundHandler);
-        app.use(secureErrorHandler);
+        try {
+          const { notFoundHandler } = await import('../src/middleware/errorHandler');
+          const { secureErrorHandler } = await import('../src/middleware/errorHandler.security');
+          app.use(notFoundHandler);
+          app.use(secureErrorHandler);
+        } catch (middlewareError) {
+          console.warn('Middleware initialization warning:', middlewareError);
+          // Ne pas bloquer si les middlewares ne peuvent pas être montés
+        }
 
         isInitialized = true;
         Logger.info('Vercel initialization completed successfully');
       } catch (error) {
-        Logger.error('Failed to initialize for Vercel', error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        console.error('Failed to initialize for Vercel:', errorMessage, errorStack);
+        try {
+          Logger.error('Failed to initialize for Vercel', error);
+        } catch {
+          // Logger peut échouer aussi
+        }
         isInitialized = false;
         initializationPromise = null;
         throw error;
@@ -85,15 +121,26 @@ async function handler(req: any, res: any) {
     // L'app Express est maintenant complètement configurée
     app(req, res);
   } catch (error: any) {
-    Logger.error('Error in Vercel handler', error);
+    // Logger peut aussi échouer, donc on utilise console.error en fallback
+    try {
+      Logger.error('Error in Vercel handler', error);
+    } catch {
+      console.error('Error in Vercel handler:', error);
+    }
     
     // Réponse d'erreur par défaut si l'initialisation échoue
     if (!res.headersSent) {
-      res.status(500).json({
-        success: false,
-        message: 'Erreur interne du serveur',
-        error: process.env.NODE_ENV === 'development' ? (error?.message || String(error)) : undefined
-      });
+      try {
+        res.status(500).json({
+          success: false,
+          message: 'Erreur interne du serveur',
+          error: process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'development' 
+            ? (error?.message || String(error)) 
+            : undefined
+        });
+      } catch (sendError) {
+        console.error('Failed to send error response:', sendError);
+      }
     }
   }
 }
