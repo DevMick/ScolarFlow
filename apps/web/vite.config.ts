@@ -28,18 +28,16 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // Forcer un seul chunk pour éviter les problèmes de partage des helpers
-        manualChunks: (id) => {
-          // Tout mettre dans un seul chunk pour éviter les problèmes d'interopération
-          if (id.includes('node_modules')) {
-            return 'vendor'
-          }
-          return 'index'
-        },
-        // Assurer la compatibilité avec les modules CommonJS/ESM
-        format: 'es',
-        // Utiliser 'compat' pour une meilleure compatibilité avec CommonJS
-        interop: 'compat',
+        // Forcer un SEUL chunk pour éviter les problèmes de partage des helpers
+        manualChunks: undefined,
+        // Utiliser inlineDynamicImports pour forcer un seul fichier
+        inlineDynamicImports: true,
+        // Utiliser IIFE au lieu d'ESM pour éviter complètement les problèmes d'interopération
+        format: 'iife',
+        // IIFE gère mieux l'interopération
+        interop: 'auto',
+        // Nom global pour IIFE
+        name: 'ScolarFlow',
         // Générer le code de manière compatible
         generatedCode: {
           constBindings: true,
@@ -48,9 +46,7 @@ export default defineConfig({
         // Préserver les helpers d'interopération
         exports: 'named',
         // Préserver les noms de fonctions pour éviter les problèmes
-        preserveModules: false,
-        // S'assurer que les helpers sont injectés inline
-        inlineDynamicImports: false
+        preserveModules: false
       },
       external: [],
       // Forcer la transformation de tous les modules CommonJS
@@ -67,8 +63,9 @@ export default defineConfig({
       include: [/node_modules/, /packages\/shared/, /\.js$/],
       transformMixedEsModules: true,
       // Forcer la transformation complète pour éviter les problèmes d'interopération
-      defaultIsModuleExports: true,
-      requireReturnsDefault: true,
+      // Utiliser 'auto' pour une meilleure détection automatique
+      defaultIsModuleExports: 'auto',
+      requireReturnsDefault: 'auto',
       // Ne pas utiliser esmExternals en production pour éviter les problèmes
       esmExternals: false,
       // Gérer spécifiquement dayjs et ses plugins
