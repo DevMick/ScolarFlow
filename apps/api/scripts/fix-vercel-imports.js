@@ -23,6 +23,31 @@ let content = fs.readFileSync(distApiServerPath, 'utf8');
 // Corriger les imports: ../src/... -> ../dist/src/... (depuis api/, le chemin vers dist/src/ est ../dist/src/)
 // Note: TypeScript compile api/server.ts et les imports dynamiques doivent pointer vers ../dist/src/
 // Dans Vercel, depuis /var/task/apps/api/api/server.js vers /var/task/apps/api/dist/src/server.js
+
+// TypeScript compile les imports dynamiques en __importStar(require(...))
+// Il faut corriger les require() à l'intérieur de __importStar()
+
+// Corriger les imports dans __importStar(require(...)) - format: __importStar(require('../src/...'))
+content = content.replace(/__importStar\(require\("\.\.\/src\//g, '__importStar(require("../dist/src/');
+content = content.replace(/__importStar\(require\('\.\.\/src\//g, "__importStar(require('../dist/src/");
+
+// Corriger les imports directs de ../src/server -> ../dist/src/server dans __importStar
+content = content.replace(/__importStar\(require\("\.\.\/src\/server"\)/g, '__importStar(require("../dist/src/server")');
+content = content.replace(/__importStar\(require\('\.\.\/src\/server'\)/g, "__importStar(require('../dist/src/server')");
+
+// Corriger les imports de ../src/utils/... -> ../dist/src/utils/...
+content = content.replace(/__importStar\(require\("\.\.\/src\/utils\//g, '__importStar(require("../dist/src/utils/');
+content = content.replace(/__importStar\(require\('\.\.\/src\/utils\//g, "__importStar(require('../dist/src/utils/");
+
+// Corriger les imports de ../src/routes -> ../dist/src/routes
+content = content.replace(/__importStar\(require\("\.\.\/src\/routes"\)/g, '__importStar(require("../dist/src/routes")');
+content = content.replace(/__importStar\(require\('\.\.\/src\/routes'\)/g, "__importStar(require('../dist/src/routes')");
+
+// Corriger les imports de ../src/middleware/... -> ../dist/src/middleware/...
+content = content.replace(/__importStar\(require\("\.\.\/src\/middleware\//g, '__importStar(require("../dist/src/middleware/');
+content = content.replace(/__importStar\(require\('\.\.\/src\/middleware\//g, "__importStar(require('../dist/src/middleware/");
+
+// Aussi corriger les require() directs (pour compatibilité)
 content = content.replace(/require\("\.\.\/src\//g, 'require("../dist/src/');
 content = content.replace(/require\('\.\.\/src\//g, "require('../dist/src/");
 // Garder ../dist/src/ tel quel car c'est le bon chemin depuis api/ vers dist/src/
