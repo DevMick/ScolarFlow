@@ -24,15 +24,16 @@ async function initializeImports() {
   
   try {
     console.log('Initializing imports...');
-    // En production (Vercel), utiliser les fichiers compilés dans dist/
-    // Depuis dist/api/server.js, le chemin vers dist/src/ est ../src/
+    // En production (Vercel), utiliser les fichiers compilés dans dist/src/
+    // Depuis apps/api/api/server.js (compilé), le chemin vers apps/api/dist/src/ est ../dist/src/
     // En développement, utiliser les fichiers source dans src/
     const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
-    // Depuis dist/api/, le chemin vers dist/src/ est ../src/ (pas ../dist/src/)
-    const serverPath = isProduction ? '../src/server' : '../src/server';
-    const utilsPath = isProduction ? '../src/utils' : '../src/utils';
-    const middlewarePath = isProduction ? '../src/middleware' : '../src/middleware';
-    const routesPath = isProduction ? '../src/routes' : '../src/routes';
+    // Dans Vercel, depuis /var/task/apps/api/api/server.js vers /var/task/apps/api/dist/src/server.js
+    // Le chemin est ../dist/src/server
+    const serverPath = isProduction ? '../dist/src/server' : '../src/server';
+    const utilsPath = isProduction ? '../dist/src/utils' : '../src/utils';
+    const middlewarePath = isProduction ? '../dist/src/middleware' : '../src/middleware';
+    const routesPath = isProduction ? '../dist/src/routes' : '../src/routes';
     
     const serverModule = await import(serverPath);
     app = serverModule.app;
@@ -106,11 +107,12 @@ async function ensureInitialized(): Promise<void> {
         }
 
         // Déterminer les chemins selon l'environnement
-        // Depuis dist/api/, le chemin vers dist/src/ est ../src/ (pas ../dist/src/)
+        // Dans Vercel, depuis /var/task/apps/api/api/server.js vers /var/task/apps/api/dist/src/
+        // Le chemin est ../dist/src/
         const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
-        const utilsPath = isProduction ? '../src/utils' : '../src/utils';
-        const middlewarePath = isProduction ? '../src/middleware' : '../src/middleware';
-        const routesPath = isProduction ? '../src/routes' : '../src/routes';
+        const utilsPath = isProduction ? '../dist/src/utils' : '../src/utils';
+        const middlewarePath = isProduction ? '../dist/src/middleware' : '../src/middleware';
+        const routesPath = isProduction ? '../dist/src/routes' : '../src/routes';
 
         // Initialize file directories (avec gestion d'erreur)
         try {

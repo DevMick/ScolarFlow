@@ -20,11 +20,12 @@ if (!fs.existsSync(distApiServerPath)) {
 
 let content = fs.readFileSync(distApiServerPath, 'utf8');
 
-// Corriger les imports: ../src/... -> ../src/... (depuis dist/api/, le chemin vers dist/src/ est ../src/)
-// Note: TypeScript peut compiler avec ../dist/src/ ou ../src/, on doit corriger les deux cas
-content = content.replace(/require\("\.\.\/dist\/src\//g, 'require("../src/');
-content = content.replace(/require\('\.\.\/dist\/src\//g, "require('../src/");
-// Garder ../src/ tel quel car depuis dist/api/, ../src/ pointe vers dist/src/
+// Corriger les imports: ../src/... -> ../dist/src/... (depuis api/, le chemin vers dist/src/ est ../dist/src/)
+// Note: TypeScript compile api/server.ts et les imports dynamiques doivent pointer vers ../dist/src/
+// Dans Vercel, depuis /var/task/apps/api/api/server.js vers /var/task/apps/api/dist/src/server.js
+content = content.replace(/require\("\.\.\/src\//g, 'require("../dist/src/');
+content = content.replace(/require\('\.\.\/src\//g, "require('../dist/src/");
+// Garder ../dist/src/ tel quel car c'est le bon chemin depuis api/ vers dist/src/
 // Corriger aussi les imports directs de ../server ou ../dist/server -> ../dist/src/server
 content = content.replace(/require\("\.\.\/server"/g, 'require("../dist/src/server"');
 content = content.replace(/require\('\.\.\/server'/g, "require('../dist/src/server'");
