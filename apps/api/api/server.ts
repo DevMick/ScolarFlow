@@ -119,7 +119,24 @@ async function handler(req: any, res: any) {
 
     // Passer la requête à l'app Express
     // L'app Express est maintenant complètement configurée
-    app(req, res);
+    // Express implémente l'interface RequestHandler qui peut être appelée avec (req, res, next)
+    // Pour Vercel, on n'a pas de next, donc on utilise un callback vide
+    app(req, res, (err: any) => {
+      if (err && !res.headersSent) {
+        console.error('Error in Express handler:', err);
+        try {
+          res.status(500).json({
+            success: false,
+            message: 'Erreur interne du serveur',
+            error: process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'development' 
+              ? (err?.message || String(err)) 
+              : undefined
+          });
+        } catch (sendError) {
+          console.error('Failed to send error response:', sendError);
+        }
+      }
+    });
   } catch (error: any) {
     // Logger peut aussi échouer, donc on utilise console.error en fallback
     try {

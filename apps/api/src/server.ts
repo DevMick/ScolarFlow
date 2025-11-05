@@ -303,10 +303,9 @@ async function initializeForVercel() {
   }
 }
 
-// Initialiser pour Vercel si nécessaire
-initializeForVercel().catch((error) => {
-  Logger.error('Critical error during Vercel initialization', error);
-});
+// Ne pas initialiser automatiquement pour Vercel ici
+// L'initialisation sera faite dans api/server.ts pour éviter les conflits
+// L'initialisation dans src/server.ts peut causer des problèmes avec les serverless functions
 
 // Démarrer le serveur seulement si on n'est pas dans un environnement serverless (Vercel)
 // Vercel définit automatiquement VERCEL=1
