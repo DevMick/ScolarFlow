@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "corepack enable && corepack prepare pnpm@8.12.0 --activate && corepack pnpm install --no-frozen-lockfile && corepack pnpm --filter @edustats/shared build && corepack pnpm --filter @edustats/api build",
-  "outputDirectory": "dist",
+  "outputDirectory": ".",
   "installCommand": "corepack enable && corepack prepare pnpm@8.12.0 --activate && corepack pnpm install --no-frozen-lockfile",
   "framework": null,
   "functions": {
