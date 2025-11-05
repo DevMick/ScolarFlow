@@ -11,9 +11,32 @@
 // Importer l'app Express et prisma depuis src/server
 /// <reference path="../src/types/express.d.ts" />
 
-import { app, prisma } from '../src/server';
-import { Logger } from '../src/utils/logger';
-import serverless from 'serverless-http';
+// Import dynamique pour éviter les erreurs au chargement du module
+let app: any;
+let prisma: any;
+let Logger: any;
+let serverless: any;
+
+async function initializeImports() {
+  if (app && prisma && Logger && serverless) {
+    return;
+  }
+  
+  try {
+    const serverModule = await import('../src/server');
+    app = serverModule.app;
+    prisma = serverModule.prisma;
+    
+    const loggerModule = await import('../src/utils/logger');
+    Logger = loggerModule.Logger;
+    
+    const serverlessModule = await import('serverless-http');
+    serverless = serverlessModule.default;
+  } catch (error) {
+    console.error('Failed to import modules:', error);
+    throw error;
+  }
+}
 
 // Variable pour suivre l'état de l'initialisation
 let isInitialized = false;
@@ -32,6 +55,9 @@ async function ensureInitialized(): Promise<void> {
   if (!initializationPromise) {
     initializationPromise = (async () => {
       try {
+        // Initialiser les imports d'abord
+        await initializeImports();
+        
         // S'assurer que VERCEL est défini pour forcer l'initialisation
         if (!process.env.VERCEL) {
           process.env.VERCEL = '1';
@@ -118,6 +144,9 @@ let serverlessHandler: any = null;
 
 async function getHandler() {
   if (!serverlessHandler) {
+    // Initialiser les imports d'abord
+    await initializeImports();
+    
     // Attendre que l'initialisation soit terminée
     await ensureInitialized();
     
@@ -138,13 +167,20 @@ async function handler(req: any, res: any) {
     const handler = await getHandler();
     
     // Appeler le handler serverless qui gère correctement l'app Express
-    return handler(req, res);
+    // serverless-http retourne une Promise, donc on doit l'attendre
+    const result = await handler(req, res);
+    return result;
   } catch (error: any) {
     // Logger peut aussi échouer, donc on utilise console.error en fallback
+    console.error('Error in Vercel handler:', error);
+    console.error('Error stack:', error?.stack);
+    
     try {
-      Logger.error('Error in Vercel handler', error);
+      if (Logger) {
+        Logger.error('Error in Vercel handler', error);
+      }
     } catch {
-      console.error('Error in Vercel handler:', error);
+      // Logger peut échouer aussi
     }
     
     // Réponse d'erreur par défaut si l'initialisation échoue
