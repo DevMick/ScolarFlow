@@ -2,6 +2,8 @@
 // MIDDLEWARE DE GESTION D'ERREURS AVANCÉ
 // ========================================
 
+/// <reference path="../types/express.d.ts" />
+
 import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
 import { 
@@ -26,7 +28,7 @@ import { Logger } from '../utils/logger';
 export const errorHandler = (
   error: Error,
   req: Request,
-  res: Response<ApiResponse>,
+  res: Response,
   next: NextFunction
 ): void => {
   // Calculer la durée de la requête
@@ -241,7 +243,7 @@ export const errorHandler = (
 const handlePrismaError = (
   error: Prisma.PrismaClientKnownRequestError,
   req: Request,
-  res: Response<ApiResponse>,
+  res: Response,
   duration?: number
 ): void => {
   const baseResponse = {
@@ -326,7 +328,7 @@ const handlePrismaError = (
  */
 export const notFoundHandler = (
   req: Request,
-  res: Response<ApiResponse>
+  res: Response
 ): void => {
   const duration = req.startTime ? Date.now() - req.startTime : undefined;
   

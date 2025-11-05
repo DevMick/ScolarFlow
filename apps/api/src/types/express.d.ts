@@ -3,7 +3,6 @@
 // ========================================
 
 import { Request } from 'express';
-import { User } from '@prisma/client';
 
 declare global {
   namespace Express {
@@ -26,8 +25,6 @@ declare global {
     }
   }
 }
-
-import { Request } from 'express';
 
 export interface AuthenticatedRequest extends Request {
   user: {
