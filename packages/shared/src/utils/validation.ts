@@ -3,7 +3,7 @@
 // ========================================
 
 import { z } from 'zod';
-import { VALIDATION_MESSAGES, getValidationMessage } from '../validation/messages';
+import { VALIDATION_MESSAGES, getValidationMessage } from '../validation/messages.js';
 
 // ========================================
 // TYPES UTILITAIRES

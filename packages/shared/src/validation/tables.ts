@@ -9,7 +9,7 @@ import {
   FormulaResultType, 
   ConditionOperator, 
   TextAlignment 
-} from '../types/tables';
+} from '../types/tables.js';
 
 // ========================================
 // SCHÉMAS DE BASE
