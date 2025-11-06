@@ -10,6 +10,20 @@ import { secureErrorHandler } from '../dist/middleware/errorHandler.security.js'
 // Variable pour suivre l'état de l'initialisation
 let isInitialized = false;
 let initializationPromise = null;
+let initializationError = null;
+
+// Vérifier les variables d'environnement critiques
+function checkEnvironmentVariables() {
+  const requiredVars = ['DATABASE_URL'];
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    const error = new Error(`Variables d'environnement manquantes: ${missingVars.join(', ')}`);
+    console.error('Environment check failed:', error.message);
+    console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('DATABASE') || k.includes('VERCEL')));
+    throw error;
+  }
+}
 
 // Fonction pour initialiser l'app pour Vercel
 async function initializeApp() {
@@ -17,18 +31,36 @@ async function initializeApp() {
     return;
   }
 
+  if (initializationError) {
+    throw initializationError;
+  }
+
   if (!initializationPromise) {
     initializationPromise = (async () => {
       try {
-        console.log('Initializing app for Vercel...');
+        console.log('[Vercel] Initializing app...');
+        console.log('[Vercel] Environment:', {
+          NODE_ENV: process.env.NODE_ENV,
+          VERCEL: process.env.VERCEL,
+          VERCEL_ENV: process.env.VERCEL_ENV,
+          hasDATABASE_URL: !!process.env.DATABASE_URL
+        });
         
-        // Connecter Prisma
+        // Vérifier les variables d'environnement
+        checkEnvironmentVariables();
+        
+        // Connecter Prisma avec gestion d'erreur améliorée
         try {
           await prisma.$connect();
-          console.log('Prisma connected');
+          console.log('[Vercel] Prisma connected successfully');
         } catch (error) {
-          // Peut être déjà connecté, ignorer
-          console.warn('Prisma connection warning:', error.message);
+          console.error('[Vercel] Prisma connection failed:', {
+            message: error?.message,
+            code: error?.code,
+            name: error?.name
+          });
+          // Ne pas ignorer l'erreur de connexion, elle est critique
+          throw new Error(`Database connection failed: ${error?.message || String(error)}`);
         }
 
         // Initialiser les routes API dynamiques
@@ -36,9 +68,12 @@ async function initializeApp() {
         try {
           const apiRoutes = await createApiRoutes(prisma);
           app.use('/api', apiRoutes);
-          console.log('API routes initialized');
+          console.log('[Vercel] API routes initialized');
         } catch (error) {
-          console.error('Failed to initialize API routes:', error);
+          console.error('[Vercel] Failed to initialize API routes:', {
+            message: error?.message,
+            stack: error?.stack
+          });
           throw error;
         }
 
@@ -46,16 +81,22 @@ async function initializeApp() {
         try {
           app.use(notFoundHandler);
           app.use(secureErrorHandler);
-          console.log('Error handlers initialized');
+          console.log('[Vercel] Error handlers initialized');
         } catch (error) {
-          console.warn('Error handlers initialization warning:', error.message);
+          console.warn('[Vercel] Error handlers initialization warning:', error.message);
         }
 
         isInitialized = true;
-        console.log('App initialized successfully for Vercel');
+        console.log('[Vercel] App initialized successfully');
       } catch (error) {
-        console.error('Failed to initialize app for Vercel:', error);
+        console.error('[Vercel] Failed to initialize app:', {
+          message: error?.message,
+          stack: error?.stack,
+          name: error?.name,
+          code: error?.code
+        });
         isInitialized = false;
+        initializationError = error;
         initializationPromise = null;
         throw error;
       }
@@ -69,16 +110,21 @@ async function initializeApp() {
 let handler = null;
 
 async function getHandler() {
-  // Initialiser l'app avant de créer le handler
-  await initializeApp();
-  
-  if (!handler) {
-    handler = serverless(app, {
-      binary: ['image/*', 'application/pdf', 'application/octet-stream'],
-    });
+  try {
+    // Initialiser l'app avant de créer le handler
+    await initializeApp();
+    
+    if (!handler) {
+      handler = serverless(app, {
+        binary: ['image/*', 'application/pdf', 'application/octet-stream'],
+      });
+    }
+    
+    return handler;
+  } catch (error) {
+    console.error('[Vercel] Failed to get handler:', error);
+    throw error;
   }
-  
-  return handler;
 }
 
 // Export pour Vercel (format serverless function)
@@ -87,17 +133,35 @@ export default async function vercelHandler(req, res) {
     const serverlessHandler = await getHandler();
     return await serverlessHandler(req, res);
   } catch (error) {
-    console.error('Error in Vercel handler:', error);
-    console.error('Error details:', {
+    console.error('[Vercel] Error in handler:', {
       message: error?.message,
       stack: error?.stack,
-      name: error?.name
+      name: error?.name,
+      code: error?.code,
+      path: req?.path,
+      method: req?.method
     });
     
+    // Si l'erreur vient de l'initialisation, retourner une erreur claire
+    if (error?.message?.includes('Database connection failed') || 
+        error?.message?.includes('Variables d\'environnement manquantes')) {
+      if (!res.headersSent) {
+        return res.status(500).json({
+          success: false,
+          message: 'Erreur de configuration du serveur',
+          code: 'CONFIGURATION_ERROR',
+          error: process.env.VERCEL_ENV === 'preview' || process.env.VERCEL_ENV === 'development' ? {
+            message: error?.message || String(error)
+          } : undefined
+        });
+      }
+    }
+    
     if (!res.headersSent) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: 'Erreur interne du serveur',
+        code: 'FUNCTION_INVOCATION_FAILED',
         error: process.env.NODE_ENV === 'development' || process.env.VERCEL_ENV === 'preview' ? {
           message: error?.message || String(error),
           stack: error?.stack
