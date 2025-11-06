@@ -1,7 +1,7 @@
 // Point d'entrée Vercel Serverless Function
 // Ce fichier réexporte l'application depuis dist/server.js
 
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
 import { existsSync } from 'fs';
 
@@ -27,6 +27,7 @@ async function loadModules() {
       console.log('[Vercel] __filename:', __filename);
       
       // Construire le chemin vers dist/server.js
+      // Dans Vercel, api/server.js est dans le dossier api/, et dist/ est au même niveau
       const distServerPath = join(__dirname, '..', 'dist', 'server.js');
       const distRoutesPath = join(__dirname, '..', 'dist', 'routes', 'index.js');
       const distErrorHandlerPath = join(__dirname, '..', 'dist', 'middleware', 'errorHandler.js');
@@ -36,9 +37,50 @@ async function loadModules() {
       console.log('[Vercel] - dist/server.js:', distServerPath, existsSync(distServerPath));
       console.log('[Vercel] - dist/routes/index.js:', distRoutesPath, existsSync(distRoutesPath));
       
-      // Essayer d'importer le module server avec chemin relatif
-      // Dans Vercel, les chemins relatifs depuis api/server.js vers dist/ devraient fonctionner
-      const serverModule = await import('../dist/server.js');
+      // Essayer plusieurs chemins possibles pour l'import
+      let serverModule;
+      const possiblePaths = [
+        '../dist/server.js',  // Chemin relatif standard (depuis api/)
+        join(__dirname, '..', 'dist', 'server.js'),  // Chemin absolu
+        './dist/server.js',  // Si on est à la racine
+        'dist/server.js'  // Si on est dans le même dossier
+      ];
+      
+      let importPath = null;
+      let lastError = null;
+      
+      for (const path of possiblePaths) {
+        try {
+          // Convertir le chemin en URL pour l'import
+          let importUrl;
+          if (path.startsWith('.')) {
+            // Chemin relatif - utiliser tel quel
+            importUrl = path;
+          } else {
+            // Chemin absolu - convertir en file:// URL
+            importUrl = pathToFileURL(path).href;
+          }
+          
+          console.log('[Vercel] Trying import path:', importUrl, '(original:', path, ')');
+          serverModule = await import(importUrl);
+          if (serverModule && serverModule.app && serverModule.prisma) {
+            importPath = importUrl;
+            console.log('[Vercel] Successfully imported from:', importUrl);
+            break;
+          } else {
+            console.log('[Vercel] Import succeeded but missing exports');
+          }
+        } catch (err) {
+          lastError = err;
+          console.log('[Vercel] Failed to import from:', path, '-', err.message);
+          continue;
+        }
+      }
+      
+      if (!serverModule || !importPath) {
+        // Si tous les chemins ont échoué, lancer l'erreur
+        throw new Error(`Failed to import server.js from any path. Last error: ${lastError?.message || 'Unknown error'}`);
+      }
       if (!serverModule.app || !serverModule.prisma) {
         throw new Error('server.js does not export app and prisma');
       }
