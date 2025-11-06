@@ -11,6 +11,14 @@
 // Importer l'app Express et prisma depuis src/server
 /// <reference path="../src/types/express.d.ts" />
 
+import { fileURLToPath } from 'url';
+import { dirname, join, resolve, relative } from 'path';
+import { existsSync } from 'fs';
+
+// Obtenir __dirname en ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // Import dynamique pour éviter les erreurs au chargement du module
 let app: any;
 let prisma: any;
@@ -24,8 +32,6 @@ async function initializeImports() {
   
   try {
     console.log('Initializing imports...');
-    const path = require('path');
-    const fs = require('fs');
     
     // En production (Vercel), utiliser les fichiers compilés dans dist/src/
     // En développement, utiliser les fichiers source dans src/
@@ -34,30 +40,29 @@ async function initializeImports() {
     // Résoudre les chemins de manière absolue depuis __dirname
     // __dirname est le dossier où se trouve api/server.js (compilé)
     const apiDir = __dirname; // /var/task/apps/api/api
-    const projectRoot = path.resolve(apiDir, '..'); // /var/task/apps/api
+    const projectRoot = resolve(apiDir, '..'); // /var/task/apps/api
     
     // Déterminer le chemin vers dist/src/ ou src/
-    const srcDir = path.join(projectRoot, isProduction ? 'dist' : '', 'src');
+    const srcDir = join(projectRoot, isProduction ? 'dist' : '', 'src');
     
     // Vérifier si le dossier dist existe, sinon utiliser src
     let actualSrcDir = srcDir;
-    if (isProduction && !fs.existsSync(srcDir)) {
+    if (isProduction && !existsSync(srcDir)) {
       console.warn('dist/src not found, trying src/');
-      actualSrcDir = path.join(projectRoot, 'src');
+      actualSrcDir = join(projectRoot, 'src');
     }
     
     // Utiliser des chemins absolus convertis en chemins relatifs pour import()
-    // ou utiliser require.resolve() pour CommonJS
-    const serverPath = path.join(actualSrcDir, 'server');
-    const utilsPath = path.join(actualSrcDir, 'utils');
-    const middlewarePath = path.join(actualSrcDir, 'middleware');
-    const routesPath = path.join(actualSrcDir, 'routes');
+    const serverPath = join(actualSrcDir, 'server');
+    const utilsPath = join(actualSrcDir, 'utils');
+    const middlewarePath = join(actualSrcDir, 'middleware');
+    const routesPath = join(actualSrcDir, 'routes');
     
     // Convertir en chemins relatifs depuis api/server.js
-    const relativeServerPath = path.relative(apiDir, serverPath);
-    const relativeUtilsPath = path.relative(apiDir, utilsPath);
-    const relativeMiddlewarePath = path.relative(apiDir, middlewarePath);
-    const relativeRoutesPath = path.relative(apiDir, routesPath);
+    const relativeServerPath = relative(apiDir, serverPath);
+    const relativeUtilsPath = relative(apiDir, utilsPath);
+    const relativeMiddlewarePath = relative(apiDir, middlewarePath);
+    const relativeRoutesPath = relative(apiDir, routesPath);
     
     // Normaliser les chemins pour import() (utiliser / au lieu de \)
     const normalizedServerPath = relativeServerPath.replace(/\\/g, '/');
@@ -144,27 +149,25 @@ async function ensureInitialized(): Promise<void> {
         }
 
         // Déterminer les chemins selon l'environnement
-        const path = require('path');
-        const fs = require('fs');
         const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
         
         // Résoudre les chemins de manière absolue depuis __dirname
         const apiDir = __dirname; // /var/task/apps/api/api
-        const projectRoot = path.resolve(apiDir, '..'); // /var/task/apps/api
+        const projectRoot = resolve(apiDir, '..'); // /var/task/apps/api
         
         // Déterminer le chemin vers dist/src/ ou src/
-        const srcDir = path.join(projectRoot, isProduction ? 'dist' : '', 'src');
+        const srcDir = join(projectRoot, isProduction ? 'dist' : '', 'src');
         
         // Vérifier si le dossier dist existe, sinon utiliser src
         let actualSrcDir = srcDir;
-        if (isProduction && !fs.existsSync(srcDir)) {
+        if (isProduction && !existsSync(srcDir)) {
           console.warn('dist/src not found, trying src/');
-          actualSrcDir = path.join(projectRoot, 'src');
+          actualSrcDir = join(projectRoot, 'src');
         }
         
-        const utilsPath = path.relative(apiDir, path.join(actualSrcDir, 'utils')).replace(/\\/g, '/');
-        const middlewarePath = path.relative(apiDir, path.join(actualSrcDir, 'middleware')).replace(/\\/g, '/');
-        const routesPath = path.relative(apiDir, path.join(actualSrcDir, 'routes')).replace(/\\/g, '/');
+        const utilsPath = relative(apiDir, join(actualSrcDir, 'utils')).replace(/\\/g, '/');
+        const middlewarePath = relative(apiDir, join(actualSrcDir, 'middleware')).replace(/\\/g, '/');
+        const routesPath = relative(apiDir, join(actualSrcDir, 'routes')).replace(/\\/g, '/');
 
         // Initialize file directories (avec gestion d'erreur)
         try {
@@ -244,8 +247,8 @@ async function getHandler() {
 
 // Export pour Vercel (format serverless function)
 // Vercel attend un handler qui gère (req, res)
-// Pour CommonJS, on utilise module.exports
-async function handler(req: any, res: any) {
+// Pour ES modules, on utilise export default
+export default async function handler(req: any, res: any) {
   try {
     console.log('Vercel handler called:', req.method, req.url);
     
@@ -307,5 +310,5 @@ async function handler(req: any, res: any) {
   }
 }
 
-// Export pour Vercel (CommonJS)
-module.exports = handler;
+// Export pour Vercel (ES modules)
+// Le handler est exporté par défaut ci-dessus
