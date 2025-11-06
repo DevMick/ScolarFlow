@@ -1,6 +1,14 @@
 // Point d'entrée Vercel Serverless Function
 // Ce fichier réexporte l'application depuis dist/server.js
 
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { existsSync } from 'fs';
+
+// Obtenir le répertoire du fichier actuel
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // Imports avec gestion d'erreur
 let app, prisma, serverless, createApiRoutes, notFoundHandler, secureErrorHandler;
 let importError = null;
@@ -15,27 +23,44 @@ async function loadModules() {
     try {
       console.log('[Vercel] Loading modules...');
       console.log('[Vercel] Current working directory:', process.cwd());
-      console.log('[Vercel] __dirname equivalent:', import.meta.url);
+      console.log('[Vercel] __dirname:', __dirname);
+      console.log('[Vercel] __filename:', __filename);
       
-      // Essayer d'importer le module server
+      // Construire le chemin vers dist/server.js
+      const distServerPath = join(__dirname, '..', 'dist', 'server.js');
+      const distRoutesPath = join(__dirname, '..', 'dist', 'routes', 'index.js');
+      const distErrorHandlerPath = join(__dirname, '..', 'dist', 'middleware', 'errorHandler.js');
+      const distSecureErrorHandlerPath = join(__dirname, '..', 'dist', 'middleware', 'errorHandler.security.js');
+      
+      console.log('[Vercel] Checking paths:');
+      console.log('[Vercel] - dist/server.js:', distServerPath, existsSync(distServerPath));
+      console.log('[Vercel] - dist/routes/index.js:', distRoutesPath, existsSync(distRoutesPath));
+      
+      // Essayer d'importer le module server avec chemin relatif
+      // Dans Vercel, les chemins relatifs depuis api/server.js vers dist/ devraient fonctionner
       const serverModule = await import('../dist/server.js');
       if (!serverModule.app || !serverModule.prisma) {
         throw new Error('server.js does not export app and prisma');
       }
       app = serverModule.app;
       prisma = serverModule.prisma;
+      console.log('[Vercel] Server module loaded');
       
       const serverlessModule = await import('serverless-http');
       serverless = serverlessModule.default;
+      console.log('[Vercel] Serverless module loaded');
       
       const routesModule = await import('../dist/routes/index.js');
       createApiRoutes = routesModule.createApiRoutes;
+      console.log('[Vercel] Routes module loaded');
       
       const errorHandlerModule = await import('../dist/middleware/errorHandler.js');
       notFoundHandler = errorHandlerModule.notFoundHandler;
+      console.log('[Vercel] Error handler module loaded');
       
       const secureErrorHandlerModule = await import('../dist/middleware/errorHandler.security.js');
       secureErrorHandler = secureErrorHandlerModule.secureErrorHandler;
+      console.log('[Vercel] Secure error handler module loaded');
       
       console.log('[Vercel] Modules loaded successfully');
     } catch (error) {
@@ -44,7 +69,10 @@ async function loadModules() {
         stack: error?.stack,
         code: error?.code,
         name: error?.name,
-        cause: error?.cause
+        cause: error?.cause,
+        errno: error?.errno,
+        syscall: error?.syscall,
+        path: error?.path
       });
       importError = error;
       throw error;
