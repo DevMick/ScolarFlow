@@ -1,11 +1,56 @@
 // Point d'entrée Vercel Serverless Function
 // Ce fichier réexporte l'application depuis dist/server.js
 
-import { app, prisma } from '../dist/server.js';
-import serverless from 'serverless-http';
-import { createApiRoutes } from '../dist/routes/index.js';
-import { notFoundHandler } from '../dist/middleware/errorHandler.js';
-import { secureErrorHandler } from '../dist/middleware/errorHandler.security.js';
+// Imports avec gestion d'erreur
+let app, prisma, serverless, createApiRoutes, notFoundHandler, secureErrorHandler;
+let importError = null;
+
+// Fonction pour charger les modules de manière asynchrone
+async function loadModules() {
+  if (importError) {
+    throw importError;
+  }
+  
+  if (!app || !prisma) {
+    try {
+      console.log('[Vercel] Loading modules...');
+      console.log('[Vercel] Current working directory:', process.cwd());
+      console.log('[Vercel] __dirname equivalent:', import.meta.url);
+      
+      // Essayer d'importer le module server
+      const serverModule = await import('../dist/server.js');
+      if (!serverModule.app || !serverModule.prisma) {
+        throw new Error('server.js does not export app and prisma');
+      }
+      app = serverModule.app;
+      prisma = serverModule.prisma;
+      
+      const serverlessModule = await import('serverless-http');
+      serverless = serverlessModule.default;
+      
+      const routesModule = await import('../dist/routes/index.js');
+      createApiRoutes = routesModule.createApiRoutes;
+      
+      const errorHandlerModule = await import('../dist/middleware/errorHandler.js');
+      notFoundHandler = errorHandlerModule.notFoundHandler;
+      
+      const secureErrorHandlerModule = await import('../dist/middleware/errorHandler.security.js');
+      secureErrorHandler = secureErrorHandlerModule.secureErrorHandler;
+      
+      console.log('[Vercel] Modules loaded successfully');
+    } catch (error) {
+      console.error('[Vercel] Failed to import modules:', {
+        message: error?.message,
+        stack: error?.stack,
+        code: error?.code,
+        name: error?.name,
+        cause: error?.cause
+      });
+      importError = error;
+      throw error;
+    }
+  }
+}
 
 // Variable pour suivre l'état de l'initialisation
 let isInitialized = false;
@@ -45,6 +90,9 @@ async function initializeApp() {
           VERCEL_ENV: process.env.VERCEL_ENV,
           hasDATABASE_URL: !!process.env.DATABASE_URL
         });
+        
+        // Charger les modules d'abord
+        await loadModules();
         
         // Vérifier les variables d'environnement
         checkEnvironmentVariables();
@@ -141,6 +189,23 @@ export default async function vercelHandler(req, res) {
       path: req?.path,
       method: req?.method
     });
+    
+    // Si l'erreur vient de l'import des modules
+    if (error?.message?.includes('Cannot find module') || 
+        error?.message?.includes('Failed to import') ||
+        error?.code === 'MODULE_NOT_FOUND') {
+      if (!res.headersSent) {
+        return res.status(500).json({
+          success: false,
+          message: 'Erreur de chargement des modules',
+          code: 'MODULE_LOAD_ERROR',
+          error: process.env.VERCEL_ENV === 'preview' || process.env.VERCEL_ENV === 'development' ? {
+            message: error?.message || String(error),
+            stack: error?.stack
+          } : undefined
+        });
+      }
+    }
     
     // Si l'erreur vient de l'initialisation, retourner une erreur claire
     if (error?.message?.includes('Database connection failed') || 
