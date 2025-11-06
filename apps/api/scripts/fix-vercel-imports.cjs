@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 /**
  * Script pour créer le point d'entrée Vercel api/server.js
- * Ce script crée un fichier simple qui réexporte depuis dist/src/server.js
+ * Ce script crée un fichier simple qui réexporte depuis dist/server.js
+ * 
+ * NOTE: Si api/server.js existe déjà et contient du code personnalisé,
+ * ce script ne le remplace pas pour éviter de perdre les modifications.
  */
 
 const fs = require('fs');
@@ -20,6 +23,16 @@ if (!fs.existsSync(distServerPath)) {
 // Créer le dossier api/ s'il n'existe pas
 if (!fs.existsSync(apiDir)) {
   fs.mkdirSync(apiDir, { recursive: true });
+}
+
+// Si api/server.js existe déjà et contient du code personnalisé, ne pas le remplacer
+if (fs.existsSync(apiServerPath)) {
+  const existingContent = fs.readFileSync(apiServerPath, 'utf8');
+  // Si le fichier contient 'initializeApp' ou 'getHandler', c'est notre version personnalisée
+  if (existingContent.includes('initializeApp') || existingContent.includes('getHandler')) {
+    console.log('✅ api/server.js already exists with custom handler, skipping...');
+    process.exit(0);
+  }
 }
 
 // Créer api/server.js avec un import simple depuis dist/server.js
