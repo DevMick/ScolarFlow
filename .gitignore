@@ -143,5 +143,6 @@ apps/web/.env
 # Turbo
 .turbo/
 
-# Fichiers générés pour Vercel (ne pas committer)
-apps/api/api/server.js
+# Fichiers générés pour Vercel
+# Note: apps/api/api/server.js est maintenant versionné car il contient le handler personnalisé
+# apps/api/api/server.js
