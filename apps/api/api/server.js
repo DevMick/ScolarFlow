@@ -3,7 +3,7 @@
 
 import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
-import { existsSync } from 'fs';
+import { existsSync, readdirSync } from 'fs';
 
 // Obtenir le répertoire du fichier actuel
 const __filename = fileURLToPath(import.meta.url);
@@ -26,8 +26,16 @@ async function loadModules() {
       console.log('[Vercel] __dirname:', __dirname);
       console.log('[Vercel] __filename:', __filename);
       
+      // Lister les fichiers dans le répertoire actuel et parent pour comprendre la structure
+      try {
+        console.log('[Vercel] Files in __dirname:', readdirSync(__dirname));
+        console.log('[Vercel] Files in parent directory:', readdirSync(join(__dirname, '..')));
+      } catch (err) {
+        console.log('[Vercel] Could not list directories:', err.message);
+      }
+      
       // Construire le chemin vers dist/server.js
-      // Dans Vercel, api/server.js est dans le dossier api/, et dist/ est au même niveau
+      // Dans Vercel avec Root Directory: apps/api, api/server.js est dans api/, et dist/ est à la racine
       const distServerPath = join(__dirname, '..', 'dist', 'server.js');
       const distRoutesPath = join(__dirname, '..', 'dist', 'routes', 'index.js');
       const distErrorHandlerPath = join(__dirname, '..', 'dist', 'middleware', 'errorHandler.js');
@@ -36,6 +44,17 @@ async function loadModules() {
       console.log('[Vercel] Checking paths:');
       console.log('[Vercel] - dist/server.js:', distServerPath, existsSync(distServerPath));
       console.log('[Vercel] - dist/routes/index.js:', distRoutesPath, existsSync(distRoutesPath));
+      
+      // Vérifier aussi si dist/ existe
+      const distDir = join(__dirname, '..', 'dist');
+      console.log('[Vercel] - dist/ directory exists:', existsSync(distDir));
+      if (existsSync(distDir)) {
+        try {
+          console.log('[Vercel] - Files in dist/:', readdirSync(distDir));
+        } catch (err) {
+          console.log('[Vercel] - Could not list dist/ directory:', err.message);
+        }
+      }
       
       // Essayer plusieurs chemins possibles pour l'import
       let serverModule;
