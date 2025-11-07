@@ -51,7 +51,8 @@
     "dist",
     "src/tests/**/*",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "src/server.ts"
   ],
   "ts-node": {
     "esm": true

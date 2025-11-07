@@ -17,6 +17,8 @@
     "clean": "rm -rf dist",
     "test:build": "node scripts/test-build.cjs",
     "test:vercel": "node scripts/test-vercel-local.cjs",
+    "test:production": "node scripts/test-production-local.mjs",
+    "test:endpoint": "node scripts/test-endpoint.mjs",
     "verify:build": "node scripts/verify-build.cjs",
     "prebuild": "prisma generate"
   },
