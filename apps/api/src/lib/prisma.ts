@@ -10,7 +10,9 @@ export const prisma =
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 
-if (process.env.NODE_ENV !== 'production') {
+// Toujours stocker dans global pour Vercel Serverless Functions
+// Cela permet de réutiliser l'instance entre les invocations
+if (!globalForPrisma.prisma) {
   globalForPrisma.prisma = prisma;
 }
 

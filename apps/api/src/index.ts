@@ -149,25 +149,6 @@ app.post('/api/admin/auth/login', async (req: express.Request, res: express.Resp
   }
 });
 
-// Routes statiques
-app.use('/api/health', healthRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/school-years', createSchoolYearsRoutes(prisma));
-app.use('/api/classes', classesRouter);
-app.use('/api/students', studentsRouter);
-app.use('/api/exports', exportsRouter);
-app.use('/api/export', exportBilanRouter);
-app.use('/api/notes', createNoteRoutes(prisma));
-app.use('/api/evaluations', evaluationsRouter);
-app.use('/api/subjects', createSubjectRoutes(prisma));
-app.use('/api/evaluation-formulas', createEvaluationFormulaRoutes(prisma));
-app.use('/api/class-average-configs', createClassAverageConfigRoutes(prisma));
-app.use('/api', moyennesRouter);
-app.use('/api/compte-gratuit', createCompteGratuitRoutes(prisma));
-app.use('/api/payments', paymentRouter);
-app.use('/api/admin/auth', adminAuthRouter);
-app.use('/api/admin', adminRouter);
-
 // Variable pour suivre l'état de l'initialisation
 let isInitialized = false;
 let initializationPromise: Promise<void> | null = null;
@@ -181,30 +162,66 @@ async function initializeApp() {
   if (!initializationPromise) {
     initializationPromise = (async () => {
       try {
-        Logger.info('Initializing app for Vercel...');
+        console.log('[Vercel] Initializing app...');
         
         // Test database connection
-        await prisma.$connect();
-        Logger.info('Connected to PostgreSQL database (Vercel)');
+        try {
+          await prisma.$connect();
+          console.log('[Vercel] Connected to PostgreSQL database');
+        } catch (dbError) {
+          console.error('[Vercel] Database connection error:', dbError);
+          throw new Error(`Database connection failed: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
+        }
 
         // Initialize file directories
-        ensureDirectories();
-        Logger.info('File directories initialized (Vercel)');
+        try {
+          ensureDirectories();
+          console.log('[Vercel] File directories initialized');
+        } catch (dirError) {
+          console.warn('[Vercel] File directories initialization warning:', dirError);
+          // Ne pas bloquer si les répertoires ne peuvent pas être créés
+        }
+
+        // Routes statiques
+        app.use('/api/health', healthRouter);
+        app.use('/api/auth', authRouter);
+        app.use('/api/school-years', createSchoolYearsRoutes(prisma));
+        app.use('/api/classes', classesRouter);
+        app.use('/api/students', studentsRouter);
+        app.use('/api/exports', exportsRouter);
+        app.use('/api/export', exportBilanRouter);
+        app.use('/api/notes', createNoteRoutes(prisma));
+        app.use('/api/evaluations', evaluationsRouter);
+        app.use('/api/subjects', createSubjectRoutes(prisma));
+        app.use('/api/evaluation-formulas', createEvaluationFormulaRoutes(prisma));
+        app.use('/api/class-average-configs', createClassAverageConfigRoutes(prisma));
+        app.use('/api', moyennesRouter);
+        app.use('/api/compte-gratuit', createCompteGratuitRoutes(prisma));
+        app.use('/api/payments', paymentRouter);
+        app.use('/api/admin/auth', adminAuthRouter);
+        app.use('/api/admin', adminRouter);
 
         // Initialize API routes (must be done before error handlers)
-        Logger.info('Initializing API routes for Vercel...');
-        const apiRoutes = await createApiRoutes(prisma);
-        app.use('/api', apiRoutes);
-        Logger.info('API routes initialized successfully for Vercel');
+        console.log('[Vercel] Initializing API routes...');
+        try {
+          const apiRoutes = await createApiRoutes(prisma);
+          app.use('/api', apiRoutes);
+          console.log('[Vercel] API routes initialized successfully');
+        } catch (routesError) {
+          console.error('[Vercel] Failed to initialize API routes:', routesError);
+          throw routesError;
+        }
 
         // Error handling middleware (must be last)
         app.use(notFoundHandler);
         app.use(secureErrorHandler);
 
         isInitialized = true;
-        Logger.info('App initialized successfully for Vercel');
+        console.log('[Vercel] App initialized successfully');
       } catch (error) {
-        Logger.error('Failed to initialize app for Vercel', error);
+        console.error('[Vercel] Failed to initialize app:', error);
+        isInitialized = false;
+        initializationPromise = null;
         throw error;
       }
     })();
@@ -220,18 +237,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await initializeApp();
     
     // Passer la requête à Express
-    app(req as any, res as any);
+    // Express peut gérer directement les objets VercelRequest et VercelResponse
+    return new Promise<void>((resolve, reject) => {
+      app(req as any, res as any, (err?: any) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
   } catch (error) {
-    Logger.error('Error in Vercel handler', error);
+    console.error('[Vercel] Error in handler:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    });
     
     if (!res.headersSent) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      
+      // Afficher plus de détails en preview/development
+      const showDetails = process.env.VERCEL_ENV === 'preview' || 
+                         process.env.VERCEL_ENV === 'development' ||
+                         process.env.NODE_ENV === 'development';
+      
       res.status(500).json({
         success: false,
         message: 'Erreur interne du serveur',
-        error: process.env.NODE_ENV === 'development' ? {
-          message: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack : undefined
-        } : undefined
+        code: 'FUNCTION_INVOCATION_FAILED',
+        ...(showDetails && {
+          error: {
+            message: errorMessage,
+            stack: errorStack
+          }
+        })
       });
     }
   }
