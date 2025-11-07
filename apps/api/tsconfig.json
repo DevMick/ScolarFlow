@@ -27,7 +27,7 @@
     "allowUnusedLabels": true,
     "allowUnreachableCode": true,
     "incremental": false,
-    "moduleResolution": "bundler",
+    "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

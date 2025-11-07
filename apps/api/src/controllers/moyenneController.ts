@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { ExportService } from '../services/exportService';
 import { createExportsService } from '../exports/exports.module';
 import { Logger } from '../utils/logger';
 import { authenticateToken } from '../middleware/auth';
 import { FILE_PATHS } from '../config/export';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 const exportService = new ExportService(prisma);
 
 // Créer une instance du service PDF

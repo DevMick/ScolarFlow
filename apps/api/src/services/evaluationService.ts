@@ -1,11 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { CreateEvaluationSimpleData, UpdateEvaluationSimpleData, EvaluationSimple } from '@edustats/shared';
+import { prisma as globalPrisma } from '../lib/prisma';
 
 export class EvaluationService {
   private prisma: PrismaClient;
 
   constructor(prisma?: PrismaClient, calculationService?: any, validationService?: any) {
-    this.prisma = prisma || new PrismaClient();
+    this.prisma = prisma || globalPrisma;
   }
 
   // Récupérer toutes les évaluations d'une classe

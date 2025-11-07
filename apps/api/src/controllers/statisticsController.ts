@@ -4,8 +4,8 @@
 
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { PrismaClient } from '@prisma/client';
 import { StatisticsEngine, ConfigurationService } from '../services/statistics';
+import { prisma } from '../lib/prisma';
 import type {
   StatisticCategory,
   CalculationType,
@@ -16,9 +16,6 @@ import type {
   LayoutType,
   ColorScheme
 } from '@edustats/shared/types/statistics';
-
-// Instance globale de Prisma
-const prisma = new PrismaClient();
 const statisticsEngine = new StatisticsEngine(prisma);
 const configurationService = new ConfigurationService(prisma);
 

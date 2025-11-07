@@ -6,7 +6,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "prisma generate && node scripts/build-ignore-errors.cjs && node scripts/fix-import-extensions.cjs && node scripts/fix-vercel-imports.cjs",
+    "build": "prisma generate && tsc && node scripts/fix-import-extensions.cjs",
     "postinstall": "prisma generate",
     "start": "node dist/server.js",
     "db:generate": "prisma generate",
@@ -45,6 +45,7 @@
     "prisma": "^5.7.1",
     "puppeteer": "^24.23.0",
     "serverless-http": "^4.0.0",
+    "@vercel/node": "^3.0.0",
     "uuid": "^9.0.1",
     "xlsx": "^0.18.5",
     "zod": "^3.22.4"

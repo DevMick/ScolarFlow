@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ClassThresholdService } from '../services/classThresholdService';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 const classThresholdService = new ClassThresholdService(prisma);
 
 export class ClassThresholdController {

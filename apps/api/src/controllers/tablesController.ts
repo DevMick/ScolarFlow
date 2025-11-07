@@ -3,7 +3,6 @@
 // ========================================
 
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { 
   CustomTableService, 
   TemplateService, 
@@ -15,8 +14,7 @@ import {
   TableExportOptions
 } from '@edustats/shared/types';
 import { AuthenticatedRequest } from '../types/express';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 const customTableService = new CustomTableService(prisma);
 const templateService = new TemplateService(prisma);
 const exportService = new ExportService(prisma);

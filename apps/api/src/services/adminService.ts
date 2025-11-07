@@ -1,8 +1,6 @@
 // Service d'authentification pour les administrateurs
-import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 
 export interface AdminData {
   id: number;

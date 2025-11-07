@@ -4,6 +4,7 @@
 
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Logger } from '../utils/logger';
+import { prisma as globalPrisma } from '../lib/prisma';
 
 export interface CreateStudentData {
   name: string;
@@ -48,8 +49,8 @@ export interface StudentWithClass {
 export class StudentService {
   private prisma: PrismaClient;
 
-  constructor() {
-    this.prisma = new PrismaClient();
+  constructor(prisma?: PrismaClient) {
+    this.prisma = prisma || globalPrisma;
   }
 
   /**

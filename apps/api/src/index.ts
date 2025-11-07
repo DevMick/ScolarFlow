@@ -1,27 +1,28 @@
 /// <reference path="./types/express.d.ts" />
 
-import express, { Express } from 'express';
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+
 // Load environment variables
 dotenv.config();
-
-// Import Prisma instance globale
-import { prisma } from './lib/prisma';
 
 // Import configurations
 import { SECURITY_CONFIG } from './config/security';
 import { helmetConfig, additionalSecurityHeaders } from './config/helmet.config';
 import { Logger } from './utils/logger';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { notFoundHandler } from './middleware/errorHandler';
 import { secureErrorHandler, validateSecurityHeaders } from './middleware/errorHandler.security';
 import { sanitizeInputs } from './middleware/validation';
 import { detectInjectionAttempts } from './middleware/securityLogging';
-import { ensureDirectories, startCleanupScheduler } from './utils/fileUpload';
-import { createServer } from 'http';
+import { ensureDirectories } from './utils/fileUpload';
+
+// Import Prisma instance globale
+import { prisma } from './lib/prisma';
 
 // Import routes
 import healthRouter from './routes/health';
@@ -44,15 +45,7 @@ import adminAuthRouter from './routes/adminAuthRoutes';
 import { createApiRoutes } from './routes';
 import AdminService from './services/adminService';
 
-const app: Express = express();
-const DEFAULT_PORT = 3001;
-const PORT = process.env.PORT || DEFAULT_PORT;
-
-// Export Prisma pour compatibilité
-export { prisma };
-
-// Export de l'app pour Vercel Serverless Functions
-export { app };
+const app = express();
 
 // ========================================
 // CONFIGURATION DE SÉCURITÉ DE BASE
@@ -156,7 +149,7 @@ app.post('/api/admin/auth/login', async (req: express.Request, res: express.Resp
   }
 });
 
-// Routes
+// Routes statiques
 app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/school-years', createSchoolYearsRoutes(prisma));
@@ -175,141 +168,72 @@ app.use('/api/payments', paymentRouter);
 app.use('/api/admin/auth', adminAuthRouter);
 app.use('/api/admin', adminRouter);
 
-// Error handling (will be set up after async routes are initialized)
-// app.use(notFoundHandler);
-// app.use(errorHandler);
+// Variable pour suivre l'état de l'initialisation
+let isInitialized = false;
+let initializationPromise: Promise<void> | null = null;
 
-/**
- * Trouve un port disponible en commençant par le port spécifié
- */
-const findAvailablePort = async (startPort: number, maxAttempts: number = 10): Promise<number> => {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    
-    server.listen(startPort, () => {
-      const port = (server.address() as any)?.port;
-      server.close(() => {
-        resolve(port || startPort);
-      });
-    });
-    
-    server.on('error', (err: any) => {
-      if (err.code === 'EADDRINUSE') {
-        if (startPort - parseInt(PORT.toString()) >= maxAttempts) {
-          reject(new Error(`No available port found after ${maxAttempts} attempts. Last attempted port: ${startPort}`));
-        } else {
-          // Essayer le port suivant
-          findAvailablePort(startPort + 1, maxAttempts)
-            .then(resolve)
-            .catch(reject);
-        }
-      } else {
-        reject(err);
+// Fonction pour initialiser l'app (routes dynamiques, connexion DB, etc.)
+async function initializeApp() {
+  if (isInitialized) {
+    return;
+  }
+
+  if (!initializationPromise) {
+    initializationPromise = (async () => {
+      try {
+        Logger.info('Initializing app for Vercel...');
+        
+        // Test database connection
+        await prisma.$connect();
+        Logger.info('Connected to PostgreSQL database (Vercel)');
+
+        // Initialize file directories
+        ensureDirectories();
+        Logger.info('File directories initialized (Vercel)');
+
+        // Initialize API routes (must be done before error handlers)
+        Logger.info('Initializing API routes for Vercel...');
+        const apiRoutes = await createApiRoutes(prisma);
+        app.use('/api', apiRoutes);
+        Logger.info('API routes initialized successfully for Vercel');
+
+        // Error handling middleware (must be last)
+        app.use(notFoundHandler);
+        app.use(secureErrorHandler);
+
+        isInitialized = true;
+        Logger.info('App initialized successfully for Vercel');
+      } catch (error) {
+        Logger.error('Failed to initialize app for Vercel', error);
+        throw error;
       }
-    });
-  });
-};
-
-// Graceful shutdown
-const gracefulShutdown = async (signal: string) => {
-  Logger.info(`Received ${signal}, shutting down gracefully...`);
-  
-  try {
-    await prisma.$disconnect();
-    Logger.info('Database connection closed');
-    process.exit(0);
-  } catch (error) {
-    Logger.error('Error during shutdown', error);
-    process.exit(1);
+    })();
   }
-};
 
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  return initializationPromise;
+}
 
-async function startServer() {
+// Handler Vercel Serverless Function
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
-    // Test database connection
-    await prisma.$connect();
-    Logger.info('Connected to PostgreSQL database');
-
-    // Initialize file directories
-    ensureDirectories();
-    Logger.info('File directories initialized');
-
-    // Start automatic cleanup scheduler
-    startCleanupScheduler();
-
-    // Initialize API routes (must be done before error handlers)
-    Logger.info('Initializing API routes...');
-    const apiRoutes = await createApiRoutes(prisma);
-    app.use('/api', apiRoutes);
-    Logger.info('API routes initialized successfully');
-
-    // Error handling middleware (must be last)
-    app.use(notFoundHandler);
-    // Utiliser le handler d'erreur sécurisé qui ne révèle pas de détails en production
-    app.use(secureErrorHandler);
-
-    // Trouver un port disponible
-    const availablePort = await findAvailablePort(parseInt(PORT.toString()));
+    // Initialiser l'app si ce n'est pas déjà fait
+    await initializeApp();
     
-    if (availablePort !== parseInt(PORT.toString())) {
-      Logger.warn(`Port ${PORT} is already in use, using port ${availablePort} instead`, {
-        requestedPort: PORT,
-        actualPort: availablePort
-      });
-    }
-
-    app.listen(availablePort, () => {
-      Logger.info(`EduStats API Server running on port ${availablePort}`, {
-        environment: process.env.NODE_ENV,
-        corsOrigin: process.env.CORS_ORIGIN,
-        requestedPort: PORT,
-        actualPort: availablePort
-      });
-    });
+    // Passer la requête à Express
+    app(req as any, res as any);
   } catch (error) {
-    Logger.error('Failed to start server', error);
-    process.exit(1);
-  }
-}
-
-// Initialiser les routes pour Vercel (même si on n'écoute pas sur un port)
-// Cela permet à l'app Express d'être utilisable directement dans Vercel
-async function initializeForVercel() {
-  if (process.env.VERCEL === '1' || process.env.LAMBDA_TASK_ROOT) {
-    try {
-      // Test database connection
-      await prisma.$connect();
-      Logger.info('Connected to PostgreSQL database (Vercel)');
-
-      // Initialize file directories
-      ensureDirectories();
-      Logger.info('File directories initialized (Vercel)');
-
-      // Initialize API routes
-      Logger.info('Initializing API routes for Vercel...');
-      const apiRoutes = await createApiRoutes(prisma);
-      app.use('/api', apiRoutes);
-      Logger.info('API routes initialized successfully for Vercel');
-
-      // Error handling middleware (must be last)
-      app.use(notFoundHandler);
-      app.use(secureErrorHandler);
-    } catch (error) {
-      Logger.error('Failed to initialize for Vercel', error);
-      throw error;
+    Logger.error('Error in Vercel handler', error);
+    
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        message: 'Erreur interne du serveur',
+        error: process.env.NODE_ENV === 'development' ? {
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined
+        } : undefined
+      });
     }
   }
 }
 
-// Ne pas initialiser automatiquement pour Vercel ici
-// L'initialisation sera faite dans api/server.ts pour éviter les conflits
-// L'initialisation dans src/server.ts peut causer des problèmes avec les serverless functions
-
-// Démarrer le serveur seulement si on n'est pas dans un environnement serverless (Vercel)
-// Vercel définit automatiquement VERCEL=1
-if (process.env.VERCEL !== '1' && !process.env.LAMBDA_TASK_ROOT) {
-  startServer();
-}

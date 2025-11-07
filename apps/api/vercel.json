@@ -1,19 +1,15 @@
 {
   "version": 2,
-  "buildCommand": "corepack enable && corepack prepare pnpm@8.12.0 --activate && corepack pnpm install --no-frozen-lockfile && corepack pnpm --filter @edustats/shared build && corepack pnpm --filter @edustats/api build",
-  "outputDirectory": ".",
-  "installCommand": "corepack enable && corepack prepare pnpm@8.12.0 --activate && corepack pnpm install --no-frozen-lockfile",
-  "framework": null,
-  "functions": {
-    "api/server.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/api/server"
+      "src": "src/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/index.ts"
     }
   ],
   "env": {
@@ -21,4 +17,3 @@
   },
   "regions": ["cdg1"]
 }
-
