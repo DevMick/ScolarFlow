@@ -35,11 +35,13 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": [
     "src/**/*",
-    "src/types/**/*"
+    "src/types/**/*",
+    "node_modules/@prisma/client"
   ],
   "exclude": [
     "node_modules",
@@ -47,5 +49,8 @@
     "src/tests/**/*",
     "**/*.test.ts",
     "**/*.spec.ts"
-  ]
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }
