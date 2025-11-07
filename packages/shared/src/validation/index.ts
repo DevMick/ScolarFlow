@@ -43,6 +43,7 @@ export {
   evaluationResultSchema,
   bulkResultsSchema,
   updateResultSchema,
+  updateEvaluationResultSchema, // Alias pour compatibilité
   deleteResultSchema,
   importResultsSchema,
   

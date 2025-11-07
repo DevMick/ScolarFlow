@@ -6,7 +6,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "prisma generate && node scripts/build-ignore-errors.cjs && node scripts/fix-vercel-imports.cjs",
+    "build": "prisma generate && node scripts/build-ignore-errors.cjs && node scripts/fix-import-extensions.cjs && node scripts/fix-vercel-imports.cjs",
     "postinstall": "prisma generate",
     "start": "node dist/server.js",
     "db:generate": "prisma generate",
@@ -16,6 +16,8 @@
     "lint": "eslint src --ext .ts,.tsx",
     "clean": "rm -rf dist",
     "test:build": "node scripts/test-build.cjs",
+    "test:vercel": "node scripts/test-vercel-local.cjs",
+    "verify:build": "node scripts/verify-build.cjs",
     "prebuild": "prisma generate"
   },
   "dependencies": {

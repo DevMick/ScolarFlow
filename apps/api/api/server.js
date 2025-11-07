@@ -97,11 +97,29 @@ async function loadModules() {
       }
       
       if (!serverModule || !importPath) {
-        // Si tous les chemins ont échoué, lancer l'erreur
-        throw new Error(`Failed to import server.js from any path. Last error: ${lastError?.message || 'Unknown error'}`);
+        // Si tous les chemins ont échoué, lancer l'erreur avec plus de détails
+        const errorDetails = {
+          message: `Failed to import server.js from any path`,
+          lastError: lastError?.message || 'Unknown error',
+          lastErrorCode: lastError?.code,
+          lastErrorPath: lastError?.path,
+          triedPaths: possiblePaths,
+          currentDir: process.cwd(),
+          __dirname: __dirname,
+          distExists: existsSync(distServerPath),
+          distPath: distServerPath
+        };
+        console.error('[Vercel] Import failed with details:', JSON.stringify(errorDetails, null, 2));
+        throw new Error(`Failed to import server.js from any path. Last error: ${lastError?.message || 'Unknown error'}. Check logs for details.`);
       }
       if (!serverModule.app || !serverModule.prisma) {
-        throw new Error('server.js does not export app and prisma');
+        const availableExports = Object.keys(serverModule || {});
+        console.error('[Vercel] Server module loaded but missing required exports:', {
+          availableExports,
+          hasApp: !!serverModule?.app,
+          hasPrisma: !!serverModule?.prisma
+        });
+        throw new Error(`server.js does not export app and prisma. Available exports: ${availableExports.join(', ')}`);
       }
       app = serverModule.app;
       prisma = serverModule.prisma;

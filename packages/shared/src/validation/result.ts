@@ -460,6 +460,9 @@ export const updateResultSchema = z.object({
   }
 });
 
+// Alias pour compatibilité avec le code existant
+export const updateEvaluationResultSchema = updateResultSchema;
+
 // ========================================
 // SCHÉMAS POUR SUPPRESSION DE RÉSULTATS
 // ========================================
