@@ -1,15 +1,22 @@
 {
   "version": 2,
+  "buildCommand": "cd apps/api && pnpm install && pnpm run db:generate",
   "builds": [
     {
-      "src": "src/index.ts",
-      "use": "@vercel/node"
+      "src": "apps/api/src/index.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "apps/api/prisma/**",
+          "apps/api/node_modules/@prisma/client/**"
+        ]
+      }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/index.ts"
+      "dest": "apps/api/src/index.ts"
     }
   ],
   "env": {

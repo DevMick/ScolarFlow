@@ -8,6 +8,7 @@
     "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "noEmit": false,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": false,
@@ -36,12 +37,14 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noEmitOnError": false,
-    "typeRoots": ["./node_modules/@types", "./src/types"]
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node", "express"]
   },
   "include": [
     "src/**/*",
     "src/types/**/*",
-    "node_modules/@prisma/client"
+    "node_modules/@prisma/client",
+    "node_modules/@types/**/*"
   ],
   "exclude": [
     "node_modules",

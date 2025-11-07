@@ -1,3 +1,4 @@
+/// <reference types="@prisma/client" />
 import { PrismaClient } from '@prisma/client';
 
 // Instance globale de Prisma pour éviter les erreurs "PrismaClient is already connected"

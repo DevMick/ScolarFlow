@@ -1,4 +1,6 @@
 /// <reference path="./types/express.d.ts" />
+/// <reference types="express" />
+/// <reference types="node" />
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import express from 'express';
