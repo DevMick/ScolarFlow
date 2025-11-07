@@ -3,7 +3,8 @@ node_modules
 .env
 .env.local
 .env.*.local
-dist
+# dist - Ne pas ignorer apps/api/dist/ car nécessaire pour les serverless functions
+# Note: apps/api/dist/ doit être inclus pour que les modules se chargent
 build
 .next
 .turbo
