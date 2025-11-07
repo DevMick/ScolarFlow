@@ -24,25 +24,7 @@ import { ensureDirectories } from './utils/fileUpload';
 // Import Prisma instance globale
 import { prisma } from './lib/prisma';
 
-// Import routes
-import healthRouter from './routes/health';
-import authRouter from './routes/auth';
-import { createSchoolYearsRoutes } from './routes/schoolYears';
-import classesRouter from './routes/classes';
-import studentsRouter from './routes/students';
-import exportsRouter from './routes/exports';
-import exportBilanRouter from './routes/exportBilan';
-import { createNoteRoutes } from './routes/notes';
-import evaluationsRouter from './routes/evaluations';
-import { createSubjectRoutes } from './routes/subjects';
-import { createEvaluationFormulaRoutes } from './routes/evaluationFormulas';
-import { createClassAverageConfigRoutes } from './routes/classAverageConfigs';
-import moyennesRouter from './routes/moyennes';
-import { createCompteGratuitRoutes } from './routes/compteGratuit';
-import paymentRouter from './routes/paymentRoutes';
-import adminRouter from './routes/adminRoutes';
-import adminAuthRouter from './routes/adminAuthRoutes';
-import { createApiRoutes } from './routes';
+// Import AdminService (utilisé dans la route admin)
 import AdminService from './services/adminService';
 
 const app = express();
@@ -182,6 +164,25 @@ async function initializeApp() {
           // Ne pas bloquer si les répertoires ne peuvent pas être créés
         }
 
+        // Importer les routes dynamiquement pour éviter les dépendances circulaires
+        const healthRouter = (await import('./routes/health.js')).default;
+        const authRouter = (await import('./routes/auth.js')).default;
+        const { createSchoolYearsRoutes } = await import('./routes/schoolYears.js');
+        const classesRouter = (await import('./routes/classes.js')).default;
+        const studentsRouter = (await import('./routes/students.js')).default;
+        const exportsRouter = (await import('./routes/exports.js')).default;
+        const exportBilanRouter = (await import('./routes/exportBilan.js')).default;
+        const { createNoteRoutes } = await import('./routes/notes.js');
+        const evaluationsRouter = (await import('./routes/evaluations.js')).default;
+        const { createSubjectRoutes } = await import('./routes/subjects.js');
+        const { createEvaluationFormulaRoutes } = await import('./routes/evaluationFormulas.js');
+        const { createClassAverageConfigRoutes } = await import('./routes/classAverageConfigs.js');
+        const moyennesRouter = (await import('./routes/moyennes.js')).default;
+        const { createCompteGratuitRoutes } = await import('./routes/compteGratuit.js');
+        const paymentRouter = (await import('./routes/paymentRoutes.js')).default;
+        const adminRouter = (await import('./routes/adminRoutes.js')).default;
+        const adminAuthRouter = (await import('./routes/adminAuthRoutes.js')).default;
+
         // Routes statiques
         app.use('/api/health', healthRouter);
         app.use('/api/auth', authRouter);
@@ -204,6 +205,7 @@ async function initializeApp() {
         // Initialize API routes (must be done before error handlers)
         console.log('[Vercel] Initializing API routes...');
         try {
+          const { createApiRoutes } = await import('./routes/index.js');
           const apiRoutes = await createApiRoutes(prisma);
           app.use('/api', apiRoutes);
           console.log('[Vercel] API routes initialized successfully');

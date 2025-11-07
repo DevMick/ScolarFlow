@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ClassAverageConfigService, CreateClassAverageConfigData } from '../services/classAverageConfigService';
 import { ApiResponseHelper } from '../utils/response';
 import { Logger } from '../utils/logger';
-import { prisma } from '../server';
+import { prisma } from '../lib/prisma';
 
 export class ClassAverageConfigController {
   private classAverageConfigService: ClassAverageConfigService;

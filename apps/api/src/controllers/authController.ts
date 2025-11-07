@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AuthService } from '../services/authService';
 import { ApiResponseHelper } from '../utils/response';
 import { Logger } from '../utils/logger';
-import { prisma } from '../server';
+import { prisma } from '../lib/prisma';
 import type { RegisterData, LoginCredentials, UpdateProfileData } from '@edustats/shared';
 
 export class AuthController {

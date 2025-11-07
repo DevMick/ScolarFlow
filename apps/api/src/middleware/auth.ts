@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { ApiResponse } from '../types/express';
 import { Logger } from '../utils/logger';
-import { prisma } from '../server';
+import { prisma } from '../lib/prisma';
 
 export interface JwtPayload {
   userId: number;

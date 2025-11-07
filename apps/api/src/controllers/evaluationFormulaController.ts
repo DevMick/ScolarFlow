@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { EvaluationFormulaService } from '../services/evaluationFormulaService';
 import { ApiResponseHelper } from '../utils/response';
 import { Logger } from '../utils/logger';
-import { prisma } from '../server';
+import { prisma } from '../lib/prisma';
 import type { CreateEvaluationFormulaData, UpdateEvaluationFormulaData } from '@edustats/shared';
 
 export class EvaluationFormulaController {

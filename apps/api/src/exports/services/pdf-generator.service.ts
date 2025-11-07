@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { EvaluationPDFData, PDFExportResult } from '../dto/pdf-export.dto';
 import { Logger } from '../../utils/logger';
-import '../templates/helpers';
+import '../templates/helpers.js';
 
 export class PdfGeneratorService {
   private browser: puppeteer.Browser | null = null;

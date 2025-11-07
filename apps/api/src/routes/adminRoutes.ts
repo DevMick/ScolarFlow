@@ -4,7 +4,7 @@ import type { Router as ExpressRouter } from 'express';
 import PaymentService from '../services/paymentService';
 import { authenticateToken } from '../middleware/auth';
 import { ApiResponse } from '../types/express';
-import { prisma } from '../server';
+import { prisma } from '../lib/prisma';
 
 const router: ExpressRouter = Router();
 

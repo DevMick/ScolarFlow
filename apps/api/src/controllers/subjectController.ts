@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { SubjectService } from '../services/subjectService';
 import { ApiResponseHelper } from '../utils/response';
 import { Logger } from '../utils/logger';
-import { prisma } from '../server';
+import { prisma } from '../lib/prisma';
 import type { CreateSubjectData, UpdateSubjectData, SubjectFilters } from '@edustats/shared';
 
 export class SubjectController {

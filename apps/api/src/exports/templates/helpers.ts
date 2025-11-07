@@ -1,4 +1,4 @@
-import * as handlebars from 'handlebars';
+import handlebars from 'handlebars';
 
 // Helper pour formater les dates
 handlebars.registerHelper('formatDate', function(date: string) {

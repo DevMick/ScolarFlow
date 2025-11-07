@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ClassService } from '../services/classService';
 import { ApiResponseHelper } from '../utils/response';
 import { Logger } from '../utils/logger';
-import { prisma } from '../server';
+import { prisma } from '../lib/prisma';
 import type { CreateClassData, UpdateClassData, ClassFilters } from '@edustats/shared';
 import { z } from 'zod';
 
