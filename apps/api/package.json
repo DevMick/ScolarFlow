@@ -20,7 +20,8 @@
     "test:production": "node scripts/test-production-local.mjs",
     "test:endpoint": "node scripts/test-endpoint.mjs",
     "verify:build": "node scripts/verify-build.cjs",
-    "prebuild": "prisma generate"
+    "prebuild": "prisma generate",
+    "postbuild": "node scripts/verify-index-exists.cjs"
   },
   "dependencies": {
     "@edustats/shared": "workspace:*",

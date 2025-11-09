@@ -2,25 +2,31 @@
   "version": 2,
   "buildCommand": "pnpm install && pnpm build",
   "installCommand": "pnpm install",
-  "devCommand": "pnpm dev",
-  "framework": null,
-  "projects": [
+  "builds": [
     {
-      "name": "api",
-      "source": "apps/api",
-      "buildCommand": "cd apps/api && pnpm build",
-      "outputDirectory": "apps/api/dist",
-      "devCommand": "cd apps/api && pnpm dev",
-      "installCommand": "pnpm install"
+      "src": "apps/web/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "apps/web/dist"
+      }
     },
     {
-      "name": "web",
-      "source": "apps/web",
-      "buildCommand": "cd apps/web && pnpm build",
-      "outputDirectory": "apps/web/dist",
-      "devCommand": "cd apps/web && pnpm dev",
-      "installCommand": "pnpm install"
+      "src": "apps/api/dist/index.js",
+      "use": "@vercel/node"
     }
-  ]
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "apps/api/dist/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "apps/web/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "regions": ["cdg1"]
 }
-

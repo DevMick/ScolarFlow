@@ -12,17 +12,14 @@ import {
   ClassInsight,
   StudentAnalysis
 } from '@edustats/shared/types';
-// TODO: Remplacer par des types locaux si le package n'existe pas
-// Import conditionnel de pdfkit pour éviter les erreurs si non installé
-let PDFDocument: any;
-try {
-  PDFDocument = require('pdfkit');
-} catch (error) {
-  console.warn('pdfkit non installé, fonctionnalités PDF désactivées');
-  PDFDocument = null;
-}
+// Import TypeScript moderne de pdfkit
+import PDFDocument from 'pdfkit';
 import * as XLSX from 'xlsx';
 import { createObjectCsvWriter } from 'csv-writer';
+
+// Type pour représenter une instance de PDFDocument
+// TypeScript 5.3.3 exige qu'on distingue valeur et type pour les classes importées
+type PDFDoc = InstanceType<typeof PDFDocument>;
 
 /**
  * Configuration pour l'export PDF
@@ -160,11 +157,6 @@ export class ExportService {
     options: ReportExportOptions
   ): Promise<ReportExportResult> {
     
-    // Vérifier si pdfkit est disponible
-    if (!PDFDocument) {
-      throw new Error('pdfkit n\'est pas installé. Veuillez exécuter: npm install pdfkit');
-    }
-    
     const filename = `bilan_annuel_${report.classId}_${report.academicYear}_${Date.now()}.pdf`;
     const filePath = path.join(this.exportDir, filename);
     
@@ -254,7 +246,7 @@ export class ExportService {
   /**
    * Génère la page de couverture
    */
-  private async generateCoverPage(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateCoverPage(doc: PDFDoc, report: AnnualReport): Promise<void> {
     const { margins } = this.pdfConfig;
     const pageWidth = doc.page.width - margins.left - margins.right;
     
@@ -326,7 +318,7 @@ export class ExportService {
   /**
    * Génère le sommaire
    */
-  private async generateTableOfContents(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateTableOfContents(doc: PDFDoc, report: AnnualReport): Promise<void> {
     doc.fontSize(20)
        .fillColor(this.pdfConfig.colors.primary)
        .text('SOMMAIRE', this.pdfConfig.margins.left, this.pdfConfig.margins.top);
@@ -357,7 +349,7 @@ export class ExportService {
   /**
    * Génère la synthèse exécutive
    */
-  private async generateExecutiveSummary(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateExecutiveSummary(doc: PDFDoc, report: AnnualReport): Promise<void> {
     doc.fontSize(20)
        .fillColor(this.pdfConfig.colors.primary)
        .text('SYNTHÈSE EXÉCUTIVE', this.pdfConfig.margins.left, this.pdfConfig.margins.top);
@@ -427,7 +419,7 @@ export class ExportService {
   /**
    * Génère les statistiques de classe avec graphiques
    */
-  private async generateClassStatistics(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateClassStatistics(doc: PDFDoc, report: AnnualReport): Promise<void> {
     doc.fontSize(20)
        .fillColor(this.pdfConfig.colors.primary)
        .text('STATISTIQUES DE CLASSE', this.pdfConfig.margins.left, this.pdfConfig.margins.top);
@@ -480,7 +472,7 @@ export class ExportService {
   /**
    * Génère les profils d'élèves
    */
-  private async generateStudentProfiles(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateStudentProfiles(doc: PDFDoc, report: AnnualReport): Promise<void> {
     doc.fontSize(20)
        .fillColor(this.pdfConfig.colors.primary)
        .text('PROFILS D\'ÉLÈVES', this.pdfConfig.margins.left, this.pdfConfig.margins.top);
@@ -533,7 +525,7 @@ export class ExportService {
   /**
    * Génère les insights détectés
    */
-  private async generateInsights(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateInsights(doc: PDFDoc, report: AnnualReport): Promise<void> {
     doc.fontSize(20)
        .fillColor(this.pdfConfig.colors.primary)
        .text('INSIGHTS ET ANALYSES', this.pdfConfig.margins.left, this.pdfConfig.margins.top);
@@ -567,7 +559,7 @@ export class ExportService {
   /**
    * Génère les recommandations pédagogiques
    */
-  private async generateRecommendations(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateRecommendations(doc: PDFDoc, report: AnnualReport): Promise<void> {
     doc.fontSize(20)
        .fillColor(this.pdfConfig.colors.primary)
        .text('RECOMMANDATIONS PÉDAGOGIQUES', this.pdfConfig.margins.left, this.pdfConfig.margins.top);
@@ -918,7 +910,7 @@ export class ExportService {
   /**
    * Génère les données détaillées (si demandées)
    */
-  private async generateDetailedData(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateDetailedData(doc: PDFDoc, report: AnnualReport): Promise<void> {
     doc.fontSize(20)
        .fillColor(this.pdfConfig.colors.primary)
        .text('DONNÉES DÉTAILLÉES', this.pdfConfig.margins.left, this.pdfConfig.margins.top);
@@ -936,7 +928,7 @@ export class ExportService {
   /**
    * Génère les annexes
    */
-  private async generateAppendices(doc: PDFKit.PDFDocument, report: AnnualReport): Promise<void> {
+  private async generateAppendices(doc: PDFDoc, report: AnnualReport): Promise<void> {
     doc.fontSize(20)
        .fillColor(this.pdfConfig.colors.primary)
        .text('ANNEXES', this.pdfConfig.margins.left, this.pdfConfig.margins.top);
