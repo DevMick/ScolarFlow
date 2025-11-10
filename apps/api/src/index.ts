@@ -54,6 +54,13 @@ function checkEnvironmentVariables() {
   return missing.length === 0;
 }
 
+// Log au démarrage du module
+console.log('[Vercel] 🚀 API module loaded');
+console.log('[Vercel] 📍 Handler location: apps/api/src/index.ts');
+console.log('[Vercel] 🌍 Environment:', process.env.NODE_ENV || 'development');
+console.log('[Vercel] 🔧 Vercel environment:', process.env.VERCEL_ENV || 'not set');
+console.log('[Vercel] ✅ Vercel detected:', process.env.VERCEL === '1' ? 'yes' : 'no');
+
 // Vérifier les variables d'environnement au démarrage
 const envCheck = checkEnvironmentVariables();
 if (!envCheck) {
@@ -139,17 +146,50 @@ async function initializeApp() {
 
 // Handler Vercel Serverless Function
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Log initial de la requête reçue
+  console.log('[Vercel Handler] ========================================');
+  console.log('[Vercel Handler] 📥 API request received');
+  console.log('[Vercel Handler] Method:', req.method);
+  console.log('[Vercel Handler] URL:', req.url);
+  console.log('[Vercel Handler] Path:', req.url?.split('?')[0]);
+  console.log('[Vercel Handler] Query:', req.query);
+  console.log('[Vercel Handler] Headers:', {
+    'content-type': req.headers['content-type'],
+    'authorization': req.headers['authorization'] ? 'present' : 'missing',
+    'origin': req.headers['origin'],
+    'user-agent': req.headers['user-agent']
+  });
+  console.log('[Vercel Handler] ========================================');
+  
   try {
     // Initialiser l'app si ce n'est pas déjà fait
+    console.log('[Vercel Handler] 🔄 Initializing app...');
     await initializeApp();
+    console.log('[Vercel Handler] ✅ App initialized');
+    
+    // Log avant de router vers Express
+    console.log('[Vercel Handler] 🔀 Routing to Express app');
+    console.log('[Vercel Handler] Request path:', req.url);
+    console.log('[Vercel Handler] Request method:', req.method);
     
     // Passer la requête à Express
     // Express peut gérer directement les objets VercelRequest et VercelResponse
     return new Promise<void>((resolve, reject) => {
+      // Log avant de passer à Express
+      console.log('[Vercel Handler] 📤 Passing request to Express app');
+      
       app(req as any, res as any, (err?: any) => {
         if (err) {
+          console.error('[Vercel Handler] ❌ Error from Express app:', {
+            message: err?.message,
+            stack: err?.stack,
+            name: err?.name
+          });
           reject(err);
         } else {
+          console.log('[Vercel Handler] ✅ Request handled successfully');
+          console.log('[Vercel Handler] Response status:', res.statusCode);
+          console.log('[Vercel Handler] Headers sent:', res.headersSent);
           resolve();
         }
       });
@@ -158,10 +198,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
     
-    console.error('[Vercel] ❌ Error in handler:', {
+    console.error('[Vercel Handler] ❌ Error in handler:', {
       message: errorMessage,
       stack: errorStack,
-      name: error instanceof Error ? error.name : undefined
+      name: error instanceof Error ? error.name : undefined,
+      url: req.url,
+      method: req.method
     });
     
     Logger.error('Error in Vercel handler', error);
@@ -172,6 +214,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                          process.env.VERCEL_ENV === 'development' ||
                          process.env.NODE_ENV === 'development';
       
+      console.log('[Vercel Handler] 📤 Sending error response');
       res.status(500).json({
         success: false,
         message: 'Erreur interne du serveur',

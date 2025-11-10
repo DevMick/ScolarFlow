@@ -112,12 +112,18 @@ app.use(sanitizeInputs);
 // Détection des tentatives d'injection
 app.use(detectInjectionAttempts);
 
-// Request logging middleware
+// Request logging middleware - Log global pour toutes les requêtes
 app.use((req, res, next) => {
   // Générer un ID unique pour la requête si non existant
   if (!req.requestId) {
     req.requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
+  
+  // Log détaillé pour le debug
+  console.log(`[Express] ${req.method} ${req.url}`);
+  console.log(`[Express] Path: ${req.path}`);
+  console.log(`[Express] Query:`, req.query);
+  console.log(`[Express] Request ID: ${req.requestId}`);
   
   Logger.info(`${req.method} ${req.path}`, {
     ip: req.ip,
