@@ -64,6 +64,27 @@ async function initializeApp() {
           throw routesError;
         }
 
+        // Root route handler - must be registered after API routes but before error handlers
+        app.get('/', (req, res) => {
+          res.json({
+            success: true,
+            message: 'API Scolar Flow is running 🚀',
+            version: '1.0.0',
+            endpoints: {
+              health: '/api/health',
+              hello: '/api/hello'
+            }
+          });
+        });
+
+        // Test route
+        app.get('/api/hello', (req, res) => {
+          res.json({ 
+            success: true,
+            message: 'Hello from Scolar Flow API' 
+          });
+        });
+
         // Error handling middleware (must be last)
         app.use(notFoundHandler);
         app.use(secureErrorHandler);
@@ -83,16 +104,6 @@ async function initializeApp() {
 
   return initializationPromise;
 }
-
-// Route racine pour vérifier que l'API fonctionne
-app.get('/', (req, res) => {
-  res.send('API Scolar Flow is running 🚀');
-});
-
-// Route de test simple
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello from Scolar Flow API' });
-});
 
 // Handler Vercel Serverless Function
 export default async function handler(req: VercelRequest, res: VercelResponse) {
