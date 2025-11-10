@@ -5,14 +5,16 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-// Import l'app Express depuis server.ts
-import { app } from '../apps/api/src/server';
-import { prisma } from '../apps/api/src/lib/prisma';
-import { Logger } from '../apps/api/src/utils/logger';
-import { ensureDirectories } from '../apps/api/src/utils/fileUpload';
-import { notFoundHandler } from '../apps/api/src/middleware/errorHandler';
-import { secureErrorHandler } from '../apps/api/src/middleware/errorHandler.security';
-import { createApiRoutes } from '../apps/api/src/routes';
+// Import l'app Express depuis les fichiers compilés dans dist/
+// Vercel compile api/index.ts mais ne peut pas résoudre les imports TypeScript relatifs vers src/
+// Utiliser les fichiers compilés dans dist/ au lieu de src/
+import { app } from '../apps/api/dist/server.js';
+import { prisma } from '../apps/api/dist/lib/prisma.js';
+import { Logger } from '../apps/api/dist/utils/logger.js';
+import { ensureDirectories } from '../apps/api/dist/utils/fileUpload.js';
+import { notFoundHandler } from '../apps/api/dist/middleware/errorHandler.js';
+import { secureErrorHandler } from '../apps/api/dist/middleware/errorHandler.security.js';
+import { createApiRoutes } from '../apps/api/dist/routes/index.js';
 
 // Variable pour suivre l'état de l'initialisation
 let isInitialized = false;
