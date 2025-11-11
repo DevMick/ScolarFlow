@@ -127,11 +127,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[API Entry] Request path:', req.url);
     console.log('[API Entry] Request method:', req.method);
     
+    // Normaliser le path pour gérer le rewrite / -> /api
+    // Si la requête arrive sur /api (via rewrite de /), on la normalise vers /
+    const originalUrl = req.url || '/';
+    if (originalUrl === '/api' || originalUrl.startsWith('/api?')) {
+      req.url = originalUrl.replace('/api', '/') || '/';
+      console.log('[API Entry] 🔄 Normalized path from /api to /');
+    }
+    
     // Passer la requête à Express
     // Express peut gérer directement les objets VercelRequest et VercelResponse
     return new Promise<void>((resolve, reject) => {
       // Log avant de passer à Express
       console.log('[API Entry] 📤 Passing request to Express app');
+      console.log('[API Entry] Final URL:', req.url);
       
       app(req as any, res as any, (err?: any) => {
         if (err) {
