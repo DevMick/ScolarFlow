@@ -65,7 +65,8 @@ async function initializeApp() {
         }
 
         // Root route handler - must be registered after API routes but before error handlers
-        app.get('/', (req, res) => {
+        // Handle both / and /api because vercel.json rewrites / to /api
+        app.get(['/', '/api'], (req, res) => {
           res.json({
             success: true,
             message: 'API Scolar Flow is running 🚀',
