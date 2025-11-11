@@ -194,14 +194,50 @@ Cela permettra au frontend d'appeler l'API sans erreurs CORS.
 - [ ] `rewrites` redirige uniquement `/api/*`
 - [ ] Variables d'environnement configurées dans Vercel
 - [ ] `CORS_ORIGIN` pointe vers `https://www.scolarflow.com`
-- [ ] Test local avec `vercel dev` fonctionne
+- [ ] Test local avec `vercel dev` fonctionne (voir `TEST_LOCAL_AVANT_VERCEL.md`)
 - [ ] Déploiement sur Vercel réussi
 - [ ] Routes `/api/*` fonctionnent
-- [ ] Routes `/` retournent 404 (normal)
+- [ ] Route `/` fonctionne (retourne JSON, pas 404)
+
+---
+
+## 🧪 Test Local Avant Déploiement
+
+**⚠️ IMPORTANT :** Testez toujours localement avant de déployer sur Vercel !
+
+Voir le guide complet : **[TEST_LOCAL_AVANT_VERCEL.md](./TEST_LOCAL_AVANT_VERCEL.md)**
+
+### Méthode Rapide
+
+```powershell
+# 1. Installer Vercel CLI (une seule fois)
+npm i -g vercel
+
+# 2. Build l'API
+cd apps/api
+pnpm build
+cd ../..
+
+# 3. Tester localement
+vercel dev
+
+# 4. Dans un autre terminal, tester les endpoints
+.\test-endpoints-local.ps1
+```
+
+Si tout fonctionne en local, vous pouvez déployer sur Vercel avec confiance !
 
 ---
 
 ## 🆘 Problèmes Courants
+
+### Problème : Route `/` retourne 404 sur Vercel
+
+**Solution :**
+- Vérifier que `vercel.json` contient le rewrite pour `/` vers `/api`
+- Vérifier que `api/index.ts` gère la route `/` avec `app.get('/', ...)`
+- Tester localement avec `vercel dev` pour reproduire le problème
+- Voir `TEST_LOCAL_AVANT_VERCEL.md` pour plus de détails
 
 ### Problème : Vercel essaie de déployer le frontend
 
