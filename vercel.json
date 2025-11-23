@@ -1,16 +1,15 @@
 {
   "version": 2,
-  "buildCommand": "cd apps/api && pnpm install && pnpm build",
-  "installCommand": "pnpm install",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api"
-    },
-    {
-      "source": "/",
-      "destination": "/api"
+      "src": "/api/(.*)",
+      "dest": "/api/index.ts"
     }
+  ],
+  "buildCommand": "cd apps/api && pnpm install && pnpm build",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/", "destination": "/api" }
   ],
   "functions": {
     "api/index.ts": {
@@ -21,6 +20,5 @@
   },
   "env": {
     "NODE_ENV": "production"
-  },
-  "regions": ["cdg1"]
+  }
 }
